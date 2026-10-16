@@ -32,15 +32,15 @@
 <main id="mapa-pantalla">
   <div class="escena">
     <div id="lienzo3d"></div>
+    <div class="pista">Arrastra para girar · toca una estrella o un hilo</div>
+  </div>
+
+  <aside class="lado">
     <div class="avisos">
       <div class="aviso" id="aviso-demo" hidden><b>Mapa de muestra.</b> Estas ocho personas son inventadas (llevan un punto tras el nombre). Crea tu estrella y el mapa se vuelve el del equipo.</div>
       <div class="aviso" id="aviso-solo" hidden><b>Primera estrella.</b> Los hilos aparecen cuando alguien más se registre. Comparte la dirección con el equipo.</div>
       <div class="aviso" id="aviso" hidden></div>
     </div>
-    <div class="pista">Arrastra para girar · toca una estrella o un hilo</div>
-  </div>
-
-  <aside class="lado">
     <!-- sin sesión: la entrada -->
     <div class="panel entrada" id="entrada" hidden>
       <h4>Entra al mapa</h4>
@@ -66,6 +66,7 @@
       <div class="elems"><span class="punto" style="color:var(--fuego);background:var(--fuego)"></span> Fuego <span class="punto" style="color:var(--tierra);background:var(--tierra)"></span> Tierra <span class="punto" style="color:var(--aire);background:var(--aire)"></span> Aire <span class="punto" style="color:var(--agua);background:var(--agua)"></span> Agua</div>
       <div class="small">Grosor del hilo: qué tanto se mueven el uno al otro. Alrededor del anillo: el signo. Altura: el lado emocional.</div>
     </div>
+    <div class="pie">Es un juego del equipo, no una evaluación: la astrología describe dinámicas y no predice ni decide nada del trabajo. El mapa enseña signos, nunca fechas. Cada quien corrige o borra lo suyo desde «Mi perfil».</div>
   </aside>
 </main>
 
@@ -120,7 +121,6 @@
   </form>
 </div>
 
-<footer>Constelación · Es un juego del equipo, no una evaluación: la astrología describe dinámicas y no predice ni decide nada del trabajo. El mapa enseña signos, nunca fechas. Cada quien corrige o borra lo suyo desde «Mi perfil».</footer>
 
 <script src="config.js"></script>
 <script src="motor.js"></script>

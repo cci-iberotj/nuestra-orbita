@@ -80,7 +80,7 @@ export function crearMapa(contenedor, {alSeleccionar}={}){
   escena.background=new THREE.Color(0x0b1026);
   escena.fog=new THREE.FogExp2(0x0b1026, 0.012);
   const camara=new THREE.PerspectiveCamera(42, 1, 0.1, 200);
-  camara.position.set(0, 7.5, 13.5);
+  camara.position.set(0, 6.2, 12);
   const renderer=new THREE.WebGLRenderer({antialias:true, powerPreference:'high-performance'});
   renderer.setPixelRatio(Math.min(devicePixelRatio,2));
   renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.05;
@@ -97,7 +97,7 @@ export function crearMapa(contenedor, {alSeleccionar}={}){
 
   const controles=new OrbitControls(camara, etiquetas.domElement);
   controles.enableDamping=true; controles.dampingFactor=.06; controles.enablePan=false;
-  controles.minDistance=8; controles.maxDistance=20; controles.minPolarAngle=.55; controles.maxPolarAngle=1.5;
+  controles.minPolarAngle=.55; controles.maxPolarAngle=1.5;
   controles.autoRotate=true; controles.autoRotateSpeed=.35;
   controles.target.set(0,.4,0);
 
@@ -283,12 +283,26 @@ export function crearMapa(contenedor, {alSeleccionar}={}){
   lienzo.addEventListener('pointerleave',()=>{ if(sobre&&!seleccion){ sobre=null; aplicarEstado(); alSeleccionar&&alSeleccionar(null,false); } });
   function describir(s){ if(!s) return null; if(s.tipo==='nodo') return {tipo:'nodo',p:lista[s.i],i:s.i}; return {tipo:'hilo',v:vinculos[s.k],k:s.k}; }
 
-  /* ---------- tamaño ---------- */
+  /* ---------- tamaño ----------
+     En escritorio la columna de paneles tapa la franja izquierda, así
+     que el anillo se centra en lo que queda libre (setViewOffset) y la
+     cámara se aleja o acerca para que el anillo llene ese espacio. */
+  let distAjuste=0;
   function redimensionar(){
     const w=contenedor.clientWidth, h=contenedor.clientHeight; if(!w||!h) return;
-    camara.aspect=w/h; camara.updateProjectionMatrix();
+    const panel = w>900 ? 390 : 0;
+    camara.aspect=(w+panel)/h; camara.setViewOffset(w+panel,h,0,0,w,h); camara.updateProjectionMatrix();
     renderer.setSize(w,h); compositor.setSize(w,h); etiquetas.setSize(w,h);
     bloom.resolution.set(w,h); hilos.forEach(x=>x.mat.resolution.set(w,h));
+    // cuánto cielo tiene que caber: el anillo con sus glifos (≈13 u) y algo de aire
+    const libre=w-panel, asp=libre/h, tanV=Math.tan(camara.fov/2*RAD);
+    const anchoVisible = libre>=h ? 13/0.74 : 13/0.96;
+    const altoVisible = Math.max(anchoVisible/asp, 9.2);
+    const d = altoVisible/(2*tanV);
+    const dir=camara.position.clone().sub(controles.target); const actual=dir.length();
+    const zoom = distAjuste ? actual/distAjuste : 1;      // respeta el zoom del usuario
+    distAjuste=d; controles.minDistance=d*.6; controles.maxDistance=d*1.6;
+    camara.position.copy(controles.target).add(dir.normalize().multiplyScalar(d*zoom));
   }
   new ResizeObserver(redimensionar).observe(contenedor); redimensionar();
 
@@ -306,7 +320,9 @@ export function crearMapa(contenedor, {alSeleccionar}={}){
     if(nodos.length){ // los hilos siguen a las estrellas que respiran
       hilos.forEach(h=>{ const a=nodos[h.v.i].grupo.position, b=nodos[h.v.j].grupo.position; const medio=a.clone().add(b).multiplyScalar(.5); const control=medio.clone().multiplyScalar(.55); control.y=medio.y+.35; moverLinea(h.linea.geometry, new THREE.QuadraticBezierCurve3(a,control,b).getPoints(36)); });
     }
-    animaciones=animaciones.filter(a=>{ a.t+=dt; const f=Math.max(0,Math.min(1,(a.t-a.retraso)/a.dur)); if(a.t>=a.retraso) a.paso(f<1?easeOut(f):1); if(f>=1){ a.fin&&a.fin(); return false; } return true; });
+    // las animaciones van con el reloj de verdad, no con los cuadros:
+    // en un teléfono lento duran lo mismo, sólo que a saltos
+    animaciones=animaciones.filter(a=>{ if(a.inicio==null) a.inicio=t; const f=Math.max(0,Math.min(1,(t-a.inicio-a.retraso)/a.dur)); if(t-a.inicio>=a.retraso) a.paso(f<1?easeOut(f):1); if(f>=1){ a.fin&&a.fin(); return false; } return true; });
     controles.target.lerp(objetivo,.04); controles.update();
     compositor.render(); etiquetas.render(escena,camara);
   }
