@@ -29,7 +29,9 @@
 --  a pedir.
 -- ═══════════════════════════════════════════════════════════
 
-create extension if not exists pgcrypto;
+-- pgcrypto ya viene en Supabase, en el esquema «extensions»; por eso
+-- abajo se llama extensions.gen_random_bytes y no a secas.
+create extension if not exists pgcrypto with schema extensions;
 
 -- ── 1. Tablas ──────────────────────────────────────────────
 create table if not exists public.ajustes (
@@ -82,7 +84,7 @@ declare
   out_ text;
 begin
   loop
-    b := gen_random_bytes(8); out_ := '';
+    b := extensions.gen_random_bytes(8); out_ := '';
     for i in 0..7 loop
       out_ := out_ || substr(abc, (get_byte(b, i) % length(abc)) + 1, 1);
     end loop;

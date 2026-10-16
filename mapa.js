@@ -217,7 +217,13 @@ function arrancar(){
   window.addEventListener('resize',prepFondo);
 }
 /* Recibe la lista completa de personas (ya con carta). */
+let firma='';
 function poner(nueva){
+  // Si no cambió nada no se redibuja: redibujar a la mitad de la
+  // animación de nacer la corta.
+  const f=nueva.map(p=>[p.id,p.actualizado||'',p.esTu?1:0].join('|')).join(';');
+  if(f===firma) return;
+  firma=f;
   const fijo = pin && pin.tipo==='nodo' ? lista[pin.i] && lista[pin.i].id : null;
   lista=nueva;
   if(pin && pin.tipo==='hilo') pin=null;

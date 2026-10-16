@@ -74,8 +74,10 @@ async function entrar(){
   // ¿viene con enlace personal?
   const c=new URLSearchParams(location.search).get('c');
   if(c){ miCodigo=c.trim().toUpperCase(); guardar(LS.codigo,miCodigo); history.replaceState(null,'',location.pathname); }
-  await cargar(true);
+  // Primero lo propio, para que la primera vez que se dibuje el mapa
+  // ya se sepa cuál estrella es la tuya y nazca brillante.
   if(miCodigo) await cargarMio();
+  await cargar(true);
   pintarPanel();
   if(sondeo) clearInterval(sondeo);
   sondeo=setInterval(()=>cargar(false), CONFIG.sondeo||15000);
@@ -121,7 +123,6 @@ async function cargarMio(){
       miCodigo=''; miId=''; guardar(LS.codigo,null); guardar(LS.id,null); modo='alta'; return;
     }
     miId=miRegistro.id; guardar(LS.id,miId); modo='mia';
-    if(filas && !filas.some(f=>f.id===miId)) await cargar(false); else refrescarMapa();
   }catch(err){ aviso('No se pudo abrir tu registro: '+err.message); }
 }
 
@@ -197,8 +198,8 @@ F.form.addEventListener('submit',async e=>{
       const r=await rpc('registrar',Object.assign({clave},datos));
       miCodigo=r.codigo; miId=r.id; guardar(LS.codigo,miCodigo); guardar(LS.id,miId);
     }
-    filas=null; await cargar(false); await cargarMio(); pintarPanel();
-    Mapa.fijar(miId);
+    await cargarMio(); filas=null; await cargar(false); pintarPanel();
+    F.msg.textContent=''; Mapa.fijar(miId);
     if(modo==='mia') $('#mia-msg').textContent = 'Listo. Guarda tu enlace: con él corriges o borras tu estrella desde cualquier dispositivo.';
   }catch(err){
     if(esClaveMala(err)){ clave=''; guardar(LS.clave,null); pedirClave('La clave cambió. Pide la nueva al equipo.'); }
