@@ -9,7 +9,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%231b1744'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%23fff'/%3E%3Ccircle cx='8' cy='10' r='1.6' fill='%23ffd79a'/%3E%3Ccircle cx='24' cy='9' r='1.3' fill='%23c9b0ff'/%3E%3Ccircle cx='23' cy='23' r='1.6' fill='%23a9d8ff'/%3E%3Cpath d='M8 10L16 16L24 9M16 16L23 23' stroke='%23ffd79a' stroke-width='.8' opacity='.7'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="estilos.css?v=2.4">
+<link rel="stylesheet" href="estilos.css?v=2.5">
 <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
 <script type="importmap">
 { "imports": {
@@ -61,12 +61,14 @@
     <div class="panel" id="mia" hidden></div>
     <div class="panel" id="clima" hidden><h4>El cielo de hoy</h4><div id="clima-cuerpo"></div></div>
     <div class="panel leyenda" id="leyenda">
-      <div class="k">Cómo leer el mapa</div>
+      <div class="k">Hilos · vínculo entre dos personas</div>
       <div><span class="hilo" style="color:var(--oro);background:var(--oro)"></span> Afinidad</div>
       <div><span class="hilo" style="color:var(--azul);background:var(--azul)"></span> Neutral</div>
       <div><span class="hilo" style="color:var(--violeta);background:var(--violeta)"></span> Tensión</div>
+      <div class="small">El grosor es la intensidad del vínculo.</div>
+      <div class="k" style="margin-top:10px">Estrellas · elemento del signo solar</div>
       <div class="elems"><span class="punto" style="color:var(--fuego);background:var(--fuego)"></span> Fuego <span class="punto" style="color:var(--tierra);background:var(--tierra)"></span> Tierra <span class="punto" style="color:var(--aire);background:var(--aire)"></span> Aire <span class="punto" style="color:var(--agua);background:var(--agua)"></span> Agua</div>
-      <div class="small">Grosor del hilo: intensidad del vínculo. Posición en el anillo: signo solar. Altura: signo lunar. Punto junto al nombre: sin hora de nacimiento.</div>
+      <div class="small">Posición en el anillo: signo solar. Altura: signo lunar. Punto junto al nombre: sin hora de nacimiento.</div>
     </div>
     <div class="pie">Es un juego del equipo, no una evaluación: la astrología describe dinámicas y no predice ni decide nada del trabajo. El mapa enseña signos, nunca fechas. Cada quien corrige o borra lo suyo desde «Mi perfil».</div>
   </aside>
@@ -130,9 +132,9 @@
 
 <div class="version" id="version"></div>
 
-<script src="config.js?v=2.4"></script>
-<script src="motor.js?v=2.4"></script>
-<script src="textos.js?v=2.4"></script>
-<script type="module" src="app.js?v=2.4"></script>
+<script src="config.js?v=2.5"></script>
+<script src="motor.js?v=2.5"></script>
+<script src="textos.js?v=2.5"></script>
+<script type="module" src="app.js?v=2.5"></script>
 </body>
 </html>

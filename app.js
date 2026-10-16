@@ -10,7 +10,7 @@
    La base se usa SÓLO a través de funciones (rpc) con el código de
    sesión; la tabla no se lee ni se escribe directo.
    ═══════════════════════════════════════════════════════════ */
-import { crearMapa } from './mapa3d.js?v=2.4';
+import { crearMapa } from './mapa3d.js?v=2.5';
 const M = window.Motor, T = window.Textos;
 const $ = s=>document.querySelector(s);
 const LS = {sesion:'orbita.sesion'};
