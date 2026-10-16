@@ -1,5 +1,5 @@
 -- ═══════════════════════════════════════════════════════════
---  Constelación · Esquema de la base (v2: nombre + PIN y perfil)
+--  Nuestra Órbita · Esquema de la base (v2: nombre + PIN y perfil)
 --  Equipo de Diseño y Medios · IBERO Tijuana
 --
 --      python supabase/correr.py esquema.sql --si-borra

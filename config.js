@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   Constelación · Configuración
+   Nuestra Órbita · Configuración
 
    Estas líneas son públicas a propósito: la llave publicable de
    Supabase está hecha para vivir en el navegador de cualquiera.
@@ -8,7 +8,7 @@
    clave del equipo (para ver) o el código personal (para editar
    o borrar lo propio).
 
-   Este proyecto de Supabase es PROPIO de Constelación. No es el
+   Este proyecto de Supabase es PROPIO de Nuestra Órbita. No es el
    de LA PIZARRA ni comparte nada con él.
    ═══════════════════════════════════════════════════════════ */
 'use strict';

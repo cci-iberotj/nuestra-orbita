@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""Sube los commits pendientes de Constelación a GitHub por su API.
+"""Sube los commits pendientes de Nuestra Órbita a GitHub por su API.
 
     python empujar.py
 
@@ -7,7 +7,7 @@ POR QUÉ EXISTE
 La red de IBERO tiene bloqueado github.com en el puerto 443, pero
 api.github.com sí responde. git push va por el primero; esto va por
 el segundo y llega igual. Es el mismo arreglo que usa LA PIZARRA
-(empujar.py), apuntado al repositorio de Constelación.
+(empujar.py), apuntado al repositorio de Nuestra Órbita.
 
 Reconstruye cada commit con la API de datos de Git -- blob, árbol,
 commit y referencia -- así que el historial queda con sus commits
@@ -35,7 +35,7 @@ import urllib.error
 import urllib.request
 
 RAIZ = os.path.dirname(os.path.abspath(__file__))
-REPO = 'cci-iberotj/constelacion'
+REPO = 'cci-iberotj/nuestra-orbita'
 RAMA = 'main'
 MARCA = os.path.join(RAIZ, '.git', 'ultimo-empujado-por-api')
 
@@ -66,7 +66,7 @@ def api(ruta, metodo='GET', cuerpo=None, tolerar=()):
         headers={'Authorization': 'Bearer ' + TOKEN,
                  'Accept': 'application/vnd.github+json',
                  'X-GitHub-Api-Version': '2022-11-28',
-                 'User-Agent': 'constelacion'})
+                 'User-Agent': 'nuestra-orbita'})
     try:
         with urllib.request.urlopen(r, timeout=120) as x:
             t = x.read().decode()
@@ -167,7 +167,7 @@ def main():
 
     print('  rama actualizada a %s' % padre[:7])
     print('  La publicación arranca sola; tarda cerca de un minuto.')
-    print('  https://cci-iberotj.github.io/constelacion/\n')
+    print('  https://cci-iberotj.github.io/nuestra-orbita/\n')
 
 
 if __name__ == '__main__':

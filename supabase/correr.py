@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
 """
-Constelación - Correr SQL en su proyecto de Supabase sin copy-paste
+Nuestra Órbita - Correr SQL en su proyecto de Supabase sin copy-paste
 
     python supabase/correr.py esquema.sql
     python supabase/correr.py "select count(*) from personas"
 
 EL PROYECTO
-Es el de Constelación, no el de LA PIZARRA. Su referencia se lee
+Es el de Nuestra Órbita, no el de LA PIZARRA. Su referencia se lee
 de config.js (la URL https://<referencia>.supabase.co), así que no
 hay forma de apuntarle a otra base por descuido.
 
@@ -64,7 +64,7 @@ def leer_token():
         salir(
             "No encuentro el token.\n\n"
             "  1. Ve a https://supabase.com/dashboard/account/tokens\n"
-            "  2. Generate new token. Nombre: constelacion\n"
+            "  2. Generate new token. Nombre: nuestra-orbita\n"
             "  3. Cópialo y pégalo TAL CUAL, solo, en este archivo:\n\n"
             "       {}\n\n"
             "  Esa carpeta está fuera del repositorio: no se sube a GitHub.".format(TOKEN)
@@ -92,7 +92,7 @@ def ejecutar(sql, token, ref):
             "Authorization": "Bearer " + token,
             "Content-Type": "application/json",
             # Sin User-Agent propio Cloudflare responde 403.
-            "User-Agent": "constelacion/1.0",
+            "User-Agent": "nuestra-orbita/1.0",
         },
         method="POST",
     )

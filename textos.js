@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   Constelación · Los textos
+   Nuestra Órbita · Los textos
    Equipo de Diseño y Medios · IBERO Tijuana
 
    Todo lo que la página le dice a alguien que no sabe nada de

@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   Constelación · La aplicación
+   Nuestra Órbita · La aplicación
    Equipo de Diseño y Medios · IBERO Tijuana
 
    Une las piezas: la entrada con nombre + PIN (que el navegador
@@ -13,7 +13,7 @@
 import { crearMapa } from './mapa3d.js';
 const M = window.Motor, T = window.Textos;
 const $ = s=>document.querySelector(s);
-const LS = {sesion:'constelacion.sesion'};
+const LS = {sesion:'orbita.sesion'};
 const guardar=(k,v)=>{ try{ v==null?localStorage.removeItem(k):localStorage.setItem(k,v); }catch(e){} };
 const leer=k=>{ try{ return localStorage.getItem(k); }catch(e){ return null; } };
 const configurada = !!(CONFIG.supabase.url && CONFIG.supabase.llave);
@@ -30,7 +30,7 @@ async function rpc(fn, args){
 const sinSesion = e => e.codigo==='28000' && /sesión/.test(e.message);
 
 /* ---------- estado ---------- */
-let sesion=leer(LS.sesion)||'';
+let sesion=leer(LS.sesion)||leer('constelacion.sesion')||'';   // la segunda llave es la del nombre viejo
 let yo=null;            // mi registro completo
 let filas=null;         // ver_personas
 let cartas=new Map();   // id|actualizado → persona

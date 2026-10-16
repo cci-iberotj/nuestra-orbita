@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   Constelación · Motor de cálculo
+   Nuestra Órbita · Motor de cálculo
    Equipo de Diseño y Medios · IBERO Tijuana
 
    Es el mismo motor del estudio de concepto (concepto.html),

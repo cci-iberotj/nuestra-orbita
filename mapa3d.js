@@ -1,5 +1,5 @@
 /* ═══════════════════════════════════════════════════════════
-   Constelación · El mapa en 3D
+   Nuestra Órbita · El mapa en 3D
    Equipo de Diseño y Medios · IBERO Tijuana
 
    Una bóveda con profundidad: el anillo de los doce signos en el

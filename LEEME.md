@@ -1,4 +1,4 @@
-# Constelación
+# Nuestra Órbita
 ### El mapa de afinidades del equipo · Diseño y Medios, IBERO Tijuana
 
 Cada quien del equipo es una estrella en una bóveda 3D: alrededor del
@@ -15,7 +15,7 @@ quien no sabe nada de horóscopos: todo en llano, con recorrido y glosario.
 
 ## Cómo entrar
 
-# https://cci-iberotj.github.io/constelacion/
+# https://cci-iberotj.github.io/nuestra-orbita/
 
 Sin clave general. Cada quien crea su estrella con su **nombre o apodo y
 un PIN de cuatro números**; el navegador lo recuerda y desde otro
@@ -48,7 +48,7 @@ sesión en ese navegador o borra la estrella.
 
 ## Dónde viven los datos
 
-En un proyecto de Supabase **propio** de Constelación (`config.js` trae
+En un proyecto de Supabase **propio** de Nuestra Órbita (`config.js` trae
 la referencia). Una tabla, `personas`, que no se puede leer ni escribir
 directo desde el navegador: todo pasa por funciones que piden el código
 de sesión (lo que se recibe al registrarse o al entrar con nombre + PIN).
