@@ -90,8 +90,8 @@ function etapa(p){
 function faltante(p){
   const e=etapa(p);
   if(e===3) return '';
-  if(e===2) return p.h!=null ? 'Agrega tu ciudad para completar tu primera impresión.' : 'Con tu hora exacta aparece tu primera impresión.';
-  return 'Agrega tu hora, aunque sea más o menos, y tu estrella crece.';
+  if(e===2) return p.h!=null ? 'Falta la ciudad: el ascendente depende del lugar de nacimiento.' : 'Falta la hora exacta: con ella se calcula el ascendente.';
+  return 'Falta la hora de nacimiento: con ella se calcula el signo lunar exacto.';
 }
 const signo = l => Math.floor(norm(l)/30);
 const grado = l => Math.floor(norm(l)%30);

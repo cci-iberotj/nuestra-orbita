@@ -10,7 +10,7 @@
    La base se usa SÓLO a través de funciones (rpc) con el código de
    sesión; la tabla no se lee ni se escribe directo.
    ═══════════════════════════════════════════════════════════ */
-import { crearMapa } from './mapa3d.js?v=2.3';
+import { crearMapa } from './mapa3d.js?v=2.4';
 const M = window.Motor, T = window.Textos;
 const $ = s=>document.querySelector(s);
 const LS = {sesion:'orbita.sesion'};
@@ -109,10 +109,10 @@ function pintarMia(){
   $('#mia').innerHTML=`<h4>${yo.nombre} <span class="muted" style="font-size:14px;font-family:Manrope">· tu estrella</span></h4>
     <div class="k">Etapa ${p.etapa} de 3</div>
     <div class="etapas"><i class="${p.etapa>=1?'on':''}"></i><i class="${p.etapa>=2?'on':''}"></i><i class="${p.etapa>=3?'on':''}"></i></div>
-    <div class="small">${falta||'Tu estrella está completa: signo, lado emocional y primera impresión.'}</div>
+    <div class="small">${falta||'Perfil completo: signo solar, signo lunar y ascendente.'}</div>
     ${falta?'<div class="cta"><button type="button" class="boton mini" id="mia-completar">Completar mi perfil</button></div>':''}
     <div class="k" style="margin-top:12px">Hilos descubiertos</div>
-    <div class="descubre">${n?`<b>${d}</b> de ${n}. ${d<n?'Toca un hilo o una estrella para descubrir uno.':'¡Los descubriste todos!'}`:'Todavía no hay nadie más en el mapa.'}</div>
+    <div class="descubre">${n?`<b>${d}</b> de ${n}. ${d<n?'Toca un hilo o una estrella para descubrir uno.':'Todos descubiertos.'}`:'Todavía no hay nadie más en el mapa.'}</div>
     ${comp.filas.length?`<div class="k" style="margin-top:12px">Lo que dijiste de ti</div>
     <div class="palabras">${comp.filas.map(f=>`<span class="${f.coincide?'si':''}">${f.coincide?'✓ ':''}${f.texto}</span>`).join('')}</div>
     <div class="small">${comp.frase}</div>`:''}
@@ -122,26 +122,26 @@ function pintarMia(){
 }
 
 const fichaDe = c => `<div class="ficha">
-  <span>Signo</span><span>${M.fmt(c.Sun)} · ${M.elemDe(c.Sun)}</span>
-  <span>Lado emocional</span><span>${M.fmt(c.Moon)}${c.exacta?'':' ≈'}</span>
-  <span>Primera impresión</span><span>${c.Asc!=null?M.fmt(c.Asc):'<i class="muted">requiere hora exacta</i>'}</span>
-  <span>Forma de pensar</span><span>${M.fmt(c.Mercury)}</span>
-  <span>Forma de querer</span><span>${M.fmt(c.Venus)}</span>
-  <span>Forma de actuar</span><span>${M.fmt(c.Mars)}</span></div>`;
+  <span>Signo solar</span><span>${M.fmt(c.Sun)} · ${M.elemDe(c.Sun)}</span>
+  <span>Signo lunar</span><span>${M.fmt(c.Moon)}${c.exacta?'':' ≈'}</span>
+  <span>Ascendente</span><span>${c.Asc!=null?M.fmt(c.Asc):'<i class="muted">requiere hora exacta</i>'}</span>
+  <span>Mercurio · mente</span><span>${M.fmt(c.Mercury)}</span>
+  <span>Venus · afecto</span><span>${M.fmt(c.Venus)}</span>
+  <span>Marte · acción</span><span>${M.fmt(c.Mars)}</span></div>`;
 
 function pintarDetalle(sel, fijo){
   const d=$('#detalle'); if(!conSesion()){ d.innerHTML=''; return; }
   if(!sel){ d.innerHTML=`<h4>Afinidades</h4><p class="vacio small" style="margin:0">Toca una estrella para ver su ficha, o un hilo para ver cómo se llevan dos personas. Arrastra para girar el cielo.</p>`; return; }
   if(sel.tipo==='nodo'){
     const p=lista.find(x=>x.id===sel.p.id)||sel.p, c=p.carta, yoMismo=esYo(p);   // la versión fresca, por si se corrigió el perfil
-    const notas=[p.c||'', p.demo?'persona inventada':'', c.exacta?'':(c.aprox?'hora aproximada: lado emocional casi exacto':'sin hora: lado emocional aproximado'), (c.exacta&&p.lugarSupuesto)?'sin ciudad: se asumió Tijuana':''].filter(Boolean);
+    const notas=[p.c||'', p.demo?'persona inventada':'', c.exacta?'':(c.aprox?'hora aproximada: signo lunar casi exacto':'sin hora: signo lunar aproximado'), (c.exacta&&p.lugarSupuesto)?'sin ciudad: se asumió Tijuana':''].filter(Boolean);
     const afines=mapa.vinculos.filter(v=>v.a.id===p.id||v.b.id===p.id).map(v=>Object.assign({otro:v.a.id===p.id?v.b:v.a},v)).sort((a,b)=>b.I-a.I).slice(0,3);
     const v=!yoMismo&&!p.demo?vinculoCon(p.id):null;
     d.innerHTML=`<h4>${p.n}${yoMismo?' <span class="muted" style="font-size:14px;font-family:Manrope">· tú</span>':''}</h4>
       <div class="k">${notas.join(' · ')}</div>${fichaDe(c)}
-      <div class="k" style="margin-top:10px">Con quién se mueve más</div>
+      <div class="k" style="margin-top:10px">Vínculos más intensos</div>
       <ul class="lista">${afines.map(x=>`<li><span class="tono" style="color:${T.tonoLlano(x.H).c}"><i></i></span>${x.otro.n}<span class="orb">${T.intensidadLlana(x.I)}</span></li>`).join('')||'<li class="vacio">todavía no hay nadie más en el mapa</li>'}</ul>
-      ${v?`<div class="cta"><button type="button" class="boton mini ${descubiertos().has(p.id)?'sec':'pulsa'}" id="d-hilo">${descubiertos().has(p.id)?'Ver nuestro hilo':'Descubrir nuestro hilo'}</button></div>`:(!yoMismo&&!p.demo&&yo?'<div class="small muted" style="margin-top:8px">Entre tú y '+p.n+' casi no hay hilo: se mueven poco el uno al otro. No es malo; es tranquilo.</div>':'')}`;
+      ${v?`<div class="cta"><button type="button" class="boton mini ${descubiertos().has(p.id)?'sec':'pulsa'}" id="d-hilo">${descubiertos().has(p.id)?'Ver nuestro hilo':'Descubrir nuestro hilo'}</button></div>`:(!yoMismo&&!p.demo&&yo?'<div class="small muted" style="margin-top:8px">Entre tú y '+p.n+' la intensidad es mínima: no hay aspectos marcados entre sus cartas.</div>':'')}`;
     const b=$('#d-hilo'); if(b) b.addEventListener('click',()=>{ const k=mapa.vinculos.indexOf(v); seleccion={tipo:'hilo',v,k}; pintarDetalle(seleccion,true); });
   } else {
     const v=sel.v; const a=v.a, b=v.b; const tn=T.tonoLlano(v.H);
@@ -149,10 +149,10 @@ function pintarDetalle(sel, fijo){
     const [p1,p2]= tuyo ? [yo.id===a.id?a:b, otro] : [a,b];
     const cl=M.climaPareja(p1.carta,p2.carta,[p1.n,p2.n],trHoy||M.cielo(new Date()));
     d.innerHTML=`<h4>${tuyo?'Tú':p1.n} <span class="muted">y</span> ${p2.n}</h4>
-      <div class="k">Qué tanto se mueven</div><div class="medidor"><i style="width:${Math.min(v.I/25*100,100)}%"></i></div><div class="small">${T.intensidadLlana(v.I)}</div>
-      <div class="k" style="margin-top:10px">Cómo se llevan</div><div class="tono" style="color:${tn.c}"><i></i>${tn.t}</div><div class="small muted">${tn.d}</div>
-      <div class="k" style="margin-top:10px">Por qué</div>
-      <ul class="lista">${v.lista.slice(0,3).map(x=>{ const xx=(tuyo&&p1===b)?Object.assign({},x,{k1:x.k2,k2:x.k1}):x; return `<li>${T.porque(xx,p1.n,p2.n,tuyo)}</li>`; }).join('')||'<li class="vacio">no hay nada muy marcado entre sus cartas; se mueven poco</li>'}</ul>
+      <div class="k">Intensidad</div><div class="medidor"><i style="width:${Math.min(v.I/25*100,100)}%"></i></div><div class="small">${T.intensidadLlana(v.I)}</div>
+      <div class="k" style="margin-top:10px">Tipo de vínculo</div><div class="tono" style="color:${tn.c}"><i></i>${tn.t}</div><div class="small muted">${tn.d}</div>
+      <div class="k" style="margin-top:10px">Aspectos principales</div>
+      <ul class="lista">${v.lista.slice(0,3).map(x=>{ const xx=(tuyo&&p1===b)?Object.assign({},x,{k1:x.k2,k2:x.k1}):x; return `<li>${T.porque(xx,p1.n,p2.n,tuyo)}</li>`; }).join('')||'<li class="vacio">sin aspectos marcados entre sus cartas</li>'}</ul>
       <div class="k" style="margin-top:10px">Hoy</div><div class="small">${T.fraseDia(cl)}</div>`;
     if(tuyo&&fijo) descubrir(otro.id);
   }
@@ -171,20 +171,20 @@ const PASOS=[
    html:d=>`<label>Nombre o apodo<input type="text" id="p-nombre" maxlength="24" value="${esc(d.nombre)}" required autocomplete="off"></label>
             ${editando?'':'<label>Elige un PIN de cuatro números<input type="password" id="p-pin" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" required autocomplete="new-password"></label><div class="small muted">Es tu llave para entrar desde otro teléfono o computadora. Aquí ya queda guardado.</div>'}`,
    leer:d=>{ d.nombre=$('#p-nombre').value.trim(); if(d.nombre.length<2) return 'Pon al menos dos letras.'; if(!editando){ d.pin=$('#p-pin').value; if(!/^\d{4}$/.test(d.pin)) return 'El PIN son cuatro números.'; } }},
-  {id:'fecha', titulo:'¿Cuándo naciste?', ayuda:'Es lo único indispensable: con la fecha ya sale tu signo y casi todo el mapa. Nadie la ve; el mapa enseña signos, no fechas.',
+  {id:'fecha', titulo:'¿Cuándo naciste?', ayuda:'Es lo único indispensable: con la fecha se calculan el signo solar y casi todo el mapa. Nadie la ve; el mapa enseña signos, no fechas.',
    html:d=>`<label>Fecha de nacimiento<input type="date" id="p-fecha" value="${d.fecha}" min="1900-01-01" required></label>`,
    leer:d=>{ d.fecha=$('#p-fecha').value; if(!d.fecha) return 'Falta la fecha.'; if(new Date(d.fecha)>new Date()) return 'Esa fecha todavía no llega.'; }},
-  {id:'hora', titulo:'¿Sabes a qué hora naciste?', ayuda:'Con la hora sale tu lado emocional exacto y, si es la hora exacta, tu primera impresión. Si no la sabes, no pasa nada: tu estrella sale igual.',
+  {id:'hora', titulo:'¿Sabes a qué hora naciste?', ayuda:'Con la hora se calcula el signo lunar exacto y, si es la hora exacta, el ascendente. Si no la sabes, tu estrella sale igual.',
    html:d=>`<div class="opciones" id="p-tipo">
       <button type="button" class="opcion ${d.hora_tipo==='exacta'?'on':''}" data-v="exacta"><b>Sí, la sé</b><small>Está en tu acta de nacimiento</small></button>
       <button type="button" class="opcion ${d.hora_tipo==='aprox'?'on':''}" data-v="aprox"><b>Más o menos</b><small>Mañana, tarde, noche…</small></button>
-      <button type="button" class="opcion ${d.hora_tipo==='no'?'on':''}" data-v="no"><b>No la sé</b><small>Tu lado emocional sale aproximado</small></button></div>
+      <button type="button" class="opcion ${d.hora_tipo==='no'?'on':''}" data-v="no"><b>No la sé</b><small>El signo lunar sale aproximado</small></button></div>
       <div id="p-hora-exacta" ${d.hora_tipo==='exacta'?'':'hidden'} style="margin-top:10px"><label>Hora<input type="time" id="p-hora" value="${d.hora}"></label></div>
       <div id="p-hora-aprox" ${d.hora_tipo==='aprox'?'':'hidden'} style="margin-top:10px"><div class="opciones dos" id="p-franja">
         ${[['madrugada','Madrugada','12 a 6 am'],['manana','Mañana','6 am a 12'],['tarde','Tarde','12 a 6 pm'],['noche','Noche','6 pm a 12']].map(([k,t,s])=>`<button type="button" class="opcion ${d.hora_franja===k?'on':''}" data-v="${k}"><b>${t}</b><small>${s}</small></button>`).join('')}</div></div>`,
    montar:d=>{ elegir('#p-tipo',v=>{ d.hora_tipo=v; $('#p-hora-exacta').hidden=v!=='exacta'; $('#p-hora-aprox').hidden=v!=='aprox'; }); elegir('#p-franja',v=>{ d.hora_franja=v; }); },
    leer:d=>{ if(d.hora_tipo==='exacta'){ d.hora=$('#p-hora').value; if(!d.hora) return 'Pon la hora, o elige «más o menos».'; } if(d.hora_tipo==='aprox'&&!d.hora_franja) return 'Elige en qué parte del día.'; }},
-  {id:'ciudad', titulo:'¿En qué ciudad naciste?', ayuda:'Sólo hace falta con hora exacta: la ciudad dice qué signo salía por el horizonte, que es tu primera impresión.',
+  {id:'ciudad', titulo:'¿En qué ciudad naciste?', ayuda:'Sólo hace falta con hora exacta: el ascendente depende del lugar de nacimiento.',
    saltar:d=>d.hora_tipo!=='exacta',
    html:d=>`<label>Ciudad<input type="search" id="p-ciudad" placeholder="Escribe y elige de la lista" value="${esc(d.ciudad?d.ciudad.nombre:'')}" autocomplete="off"></label><div class="sug" id="p-sug"></div><div class="small muted">Si la dejas vacía se asume Tijuana.</div>`,
    montar:d=>{ let timer=null; $('#p-ciudad').addEventListener('input',e=>{ d.ciudad=null; clearTimeout(timer); const q=e.target.value.trim(); if(q.length<3){ $('#p-sug').innerHTML=''; return; } timer=setTimeout(()=>buscarCiudad(q,d),350); }); },

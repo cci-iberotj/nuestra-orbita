@@ -14,40 +14,39 @@ const M = window.Motor;
 
 /* ---------- cada punto de la carta, en llano ---------- */
 const PUNTO = {
-  Sun:     {corto:'tu signo',             largo:'tu signo (el Sol): lo que eres en esencia'},
-  Moon:    {corto:'tu lado emocional',    largo:'tu lado emocional (la Luna): cómo sientes por dentro'},
-  Asc:     {corto:'tu primera impresión', largo:'tu primera impresión (el Ascendente): cómo te ven al conocerte'},
-  Mercury: {corto:'tu forma de pensar',   largo:'tu forma de pensar (Mercurio): cómo razonas y hablas'},
-  Venus:   {corto:'tu forma de querer',   largo:'tu forma de querer (Venus): qué te gusta y cómo te acercas'},
-  Mars:    {corto:'tu forma de actuar',   largo:'tu forma de actuar (Marte): cómo te mueves y cómo peleas'},
+  Sun:     {corto:'tu signo solar',  largo:'signo solar (el Sol): la esencia'},
+  Moon:    {corto:'tu signo lunar',  largo:'signo lunar (la Luna): la emoción'},
+  Asc:     {corto:'tu ascendente',   largo:'ascendente: la primera impresión'},
+  Mercury: {corto:'tu Mercurio',     largo:'Mercurio: la mente'},
+  Venus:   {corto:'tu Venus',        largo:'Venus: el afecto'},
+  Mars:    {corto:'tu Marte',        largo:'Marte: la acción'},
 };
-/* «el signo de Aurora», «el lado emocional de Mateo» */
-const de = (k, nombre) => PUNTO[k].corto.replace('tu ', k==='Sun'?'el ':k==='Moon'?'el ':k==='Asc'?'la ':k==='Mercury'?'la ':k==='Venus'?'la ':'la ') + ' de ' + nombre;
+/* «el signo solar de Aurora», «el Marte de Mateo» */
+const de = (k, nombre) => PUNTO[k].corto.replace('tu ','el ') + ' de ' + nombre;
 
-const ELEMENTO = {fuego:'impulso', tierra:'lo práctico', aire:'las ideas', agua:'la emoción'};
-const ELEMENTO_FRASE = {fuego:'de impulso y entusiasmo', tierra:'de los pies en la tierra', aire:'de ideas y conversación', agua:'de emoción y sensibilidad'};
+const ELEMENTO = {fuego:'fuego', tierra:'tierra', aire:'aire', agua:'agua'};
+const ELEMENTO_FRASE = {fuego:'fuego (impulso)', tierra:'tierra (lo práctico)', aire:'aire (ideas)', agua:'agua (emoción)'};
 
 /* ---------- vínculos ---------- */
-const ASPECTO_LLANO = {0:'en la misma frecuencia', 60:'en sintonía', 120:'en sintonía plena', 90:'se retan', 180:'de frente, como espejo'};
+const ASPECTO_LLANO = {0:'conjunción', 60:'armonía (sextil)', 120:'armonía (trígono)', 90:'tensión (cuadratura)', 180:'tensión (oposición)'};
 const TONO_LLANO = {
-  'Afinidad luminosa':   {t:'Fluyen de maravilla', d:'Casi todo entre ustedes va fácil.'},
-  'Fluye':               {t:'Fluyen',              d:'Se entienden sin esforzarse.'},
-  'Neutra, independiente':{t:'Cada quien en lo suyo', d:'Ni chocan ni se buscan; se respetan.'},
-  'Tensión creativa':    {t:'Se retan',            d:'Chocan un poco, y de ahí salen ideas.'},
-  'Chispa fuerte':       {t:'Chispa fuerte',       d:'Mucha energía entre ustedes; da para mucho si se encauza.'},
+  'Afinidad luminosa':    {t:'Afinidad alta', d:'Casi todos los aspectos entre sus cartas son armónicos.'},
+  'Fluye':                {t:'Afinidad',      d:'Predominan los aspectos armónicos.'},
+  'Neutra, independiente':{t:'Neutral',       d:'Sin aspectos marcados en ningún sentido.'},
+  'Tensión creativa':     {t:'Tensión',       d:'Predominan los aspectos de tensión: fricción y también impulso.'},
+  'Chispa fuerte':        {t:'Tensión alta',  d:'Casi todos los aspectos entre sus cartas son de tensión.'},
 };
 const INTENSIDAD_LLANA = {
-  'mínima':'casi no se mueven', 'moderada':'se mueven un poco', 'significativa':'se mueven bastante',
-  'alta':'se mueven mucho', 'excepcional':'se mueven como con nadie',
+  'mínima':'intensidad mínima', 'moderada':'intensidad moderada', 'significativa':'intensidad significativa',
+  'alta':'intensidad alta', 'excepcional':'intensidad excepcional',
 };
 function tonoLlano(h){ const t=M.tono(h); return Object.assign({c:t.c}, TONO_LLANO[t.t]); }
 function intensidadLlana(pts){ return INTENSIDAD_LLANA[M.banda(pts)]; }
-/* «Tu lado emocional y el signo de Mateo están en sintonía (☽ △ ☉)» */
+/* «Tu signo lunar y el signo solar de Mateo: armonía (trígono) ☽ △ ☉» */
 function porque(x, a, b, tu){
   const izq = tu ? PUNTO[x.k1].corto.replace(/^tu /,'Tu ') : de(x.k1,a).replace(/^./,c=>c.toUpperCase());
   const der = de(x.k2,b);
-  const verbo = x.a.a===90 ? 'se retan' : x.a.a===180 ? 'están de frente, como espejo' : x.a.a===0 ? 'están en la misma frecuencia' : x.a.a===120 ? 'están en sintonía plena' : 'están en sintonía';
-  return `${izq} y ${der} ${verbo} <span class="glifo">${M.PGL[x.k1]} ${x.a.s} ${M.PGL[x.k2]}</span>`;
+  return `${izq} y ${der}: ${ASPECTO_LLANO[x.a.a]} <span class="glifo">${M.PGL[x.k1]} ${x.a.s} ${M.PGL[x.k2]}</span>`;
 }
 
 /* ---------- pronombres ---------- */
@@ -96,52 +95,47 @@ function comparar(palabras, c, pr){
   const sugeridas=PALABRAS.filter(w=>w.e.includes(fuerte) && !(palabras||[]).includes(w.k)).slice(0,2).map(w=>palabra(w.k,pr));
   let frase;
   if(!filas.length) frase='';
-  else if(n===filas.length) frase=`Tu carta está de acuerdo contigo en todo: pesa lo ${ELEMENTO_FRASE[fuerte]}.`;
-  else if(n>0) frase=`Tu carta coincide en ${n} de ${filas.length}. Lo que más pesa en ella es lo ${ELEMENTO_FRASE[fuerte]}${sugeridas.length?`; también te vería ${sugeridas.join(' y ')}`:''}.`;
-  else frase=`Sorpresa: tu carta te ve distinto. Pesa lo ${ELEMENTO_FRASE[fuerte]}${sugeridas.length?`, más bien ${sugeridas.join(' o ')}`:''}.`;
+  else frase=`Elemento dominante en tu carta: ${ELEMENTO_FRASE[fuerte]}. Coinciden ${n} de ${filas.length}.${sugeridas.length?` La carta también sugiere: ${sugeridas.join(', ')}.`:''}`;
   return {filas, n, frase, fuerte};
 }
 
 /* ---------- el cielo de hoy, en llano ---------- */
 function climaLlano(tr, lista){
-  const luna = `La Luna está en ${M.SIGNOS[M.signo(tr.Moon)]}: hoy el ánimo del equipo tira a lo ${ELEMENTO[M.elemDe(tr.Moon)]}.`;
+  const luna = `Luna en ${M.SIGNOS[M.signo(tr.Moon)]}, elemento ${ELEMENTO[M.elemDe(tr.Moon)]}.`;
   const tocados=lista.filter(p=>p.lunaToca);
   const quien = !lista.length ? '' : tocados.length
-    ? `Hoy la Luna toca a ${tocados.map(p=>`<b>${p.n}</b>`).join(', ')}: su lado emocional anda más despierto.`
-    : 'Hoy la Luna no toca a nadie del mapa; día parejo.';
+    ? `Hoy la Luna forma aspecto con ${tocados.map(p=>`<b>${p.n}</b>`).join(', ')}.`
+    : 'Hoy la Luna no forma aspecto con nadie del mapa.';
   return {luna, quien};
 }
-/* La frase del día para una pareja. */
+/* La frase del día para una pareja: el texto del motor, con los
+   puntos nombrados igual que en el resto de la página. */
 function fraseDia(cl){
-  if(!cl.length) return 'Hoy no hay nada especial en el cielo entre ustedes. Día tranquilo.';
+  if(!cl.length) return 'Hoy no hay aspectos del cielo con sus cartas.';
   return cl.map(x=>{
-    const t = x.txt.replace(/^Luna/,'El lado emocional del equipo (la Luna)').replace(/^Sol/,'El Sol').replace(/^Venus/,'Venus').replace(/^Marte/,'Marte')
-      .replace(/ sobre la Luna de /,' se para justo sobre el lado emocional de ').replace(/ sobre el Sol de /,' se para justo sobre el signo de ').replace(/ sobre el Ascendente de /,' se para justo sobre la primera impresión de ')
-      .replace(/ en trígono a la Luna de /,' está en sintonía plena con el lado emocional de ').replace(/ en trígono al Sol de /,' está en sintonía plena con el signo de ').replace(/ en trígono al Ascendente de /,' está en sintonía plena con la primera impresión de ')
-      .replace(/ en sextil a la Luna de /,' está en sintonía con el lado emocional de ').replace(/ en sextil al Sol de /,' está en sintonía con el signo de ').replace(/ en sextil al Ascendente de /,' está en sintonía con la primera impresión de ')
-      .replace(/ en cuadratura a la Luna de /,' reta al lado emocional de ').replace(/ en cuadratura al Sol de /,' reta al signo de ').replace(/ en cuadratura al Ascendente de /,' reta a la primera impresión de ')
-      .replace(/ en oposición a la Luna de /,' está de frente al lado emocional de ').replace(/ en oposición al Sol de /,' está de frente al signo de ').replace(/ en oposición al Ascendente de /,' está de frente a la primera impresión de ');
-    return `${t}: <b>${x.pos?'día ligero entre ustedes':'día con chispa entre ustedes'}</b>.`;
+    const t = x.txt.replace(/ sobre el Sol de /,' en conjunción con el signo solar de ').replace(/ sobre la Luna de /,' en conjunción con el signo lunar de ').replace(/ sobre el Ascendente de /,' en conjunción con el ascendente de ')
+      .replace(/ al Sol de /,' al signo solar de ').replace(/ a la Luna de /,' al signo lunar de ').replace(/ al Ascendente de /,' al ascendente de ');
+    return `${t}: <b>${x.pos?'armonía':'tensión'}</b>.`;
   }).join(' ');
 }
 
 /* ---------- glosario ---------- */
 const GLOSARIO = [
-  {t:'Tu signo (el Sol)', d:'El de siempre, el que todo mundo sabe: dónde estaba el Sol el día que naciste. Dice lo que eres en esencia. En el mapa marca en qué parte del anillo está tu estrella.'},
-  {t:'Tu lado emocional (la Luna)', d:'Dónde estaba la Luna cuando naciste. Cambia de signo cada dos días y medio, por eso ayuda saber la hora. Dice cómo sientes por dentro. En el mapa es la altura de tu estrella.'},
-  {t:'Tu primera impresión (el Ascendente)', d:'El signo que salía por el horizonte a la hora exacta en que naciste, en tu ciudad. Dice cómo te ven al conocerte. Sin hora exacta no se puede calcular; no pasa nada.'},
-  {t:'Los hilos', d:'Cada hilo une a dos personas. Su grosor es qué tanto se mueven el uno al otro; su color es cómo se llevan: dorado fluyen, azul cada quien en lo suyo, violeta se retan. Ninguno es «malo»: retarse también enciende cosas.'},
-  {t:'Los cuatro elementos', d:'Cada signo pertenece a uno: fuego (impulso), tierra (lo práctico), aire (las ideas) o agua (la emoción). Es el color del brillo de cada estrella. Los del mismo elemento se entienden rápido; fuego con aire y tierra con agua también se llevan.'},
-  {t:'El cielo de hoy', d:'Dónde están el Sol, la Luna, Venus y Marte en este momento, marcados en el anillo. La Luna recorre todo el anillo en un mes y «toca» a quien pasa cerca: esa estrella late. Por eso el mapa cambia cada día sin que nadie haga nada.'},
-  {t:'Descubrir un hilo', d:'Toca un hilo o la estrella de alguien y se abre su lectura. Cada hilo descubierto queda encendido para ti. La meta es descubrirlos todos.'},
+  {t:'Signo solar', d:'El signo de siempre: dónde estaba el Sol el día que naciste. Representa la esencia. En el mapa marca la posición de la estrella en el anillo.'},
+  {t:'Signo lunar', d:'Dónde estaba la Luna cuando naciste. Cambia de signo cada dos días y medio; por eso ayuda saber la hora. Representa la emoción. En el mapa es la altura de la estrella.'},
+  {t:'Ascendente', d:'El signo que salía por el horizonte a la hora exacta y en el lugar en que naciste. Representa la primera impresión. Sin hora exacta no se calcula.'},
+  {t:'Aspectos', d:'Ángulos entre los puntos de dos cartas. Armonía: trígono (120°) y sextil (60°). Tensión: cuadratura (90°) y oposición (180°). Conjunción (0°): misma posición.'},
+  {t:'Hilos', d:'Cada hilo une a dos personas. Grosor: intensidad del vínculo (cuántos aspectos y qué tan exactos). Color: tipo de vínculo. Dorado afinidad, azul neutral, violeta tensión. Ninguno es malo; la tensión también da impulso.'},
+  {t:'Elementos', d:'Cada signo pertenece a uno: fuego (impulso), tierra (lo práctico), aire (ideas) o agua (emoción). Es el color del brillo de cada estrella.'},
+  {t:'Cielo de hoy', d:'Posición actual del Sol, la Luna, Venus y Marte, marcada en el anillo. La Luna recorre el anillo en un mes y forma aspectos con las estrellas que pasa cerca: esa estrella late. Por eso el mapa cambia cada día.'},
 ];
 
 /* ---------- recorrido ---------- */
 const RECORRIDO = [
-  {t:'Tu estrella', d:'Eres una estrella en el mapa. Alrededor del anillo está tu signo; la altura es tu lado emocional. Tu estrella crece en tres etapas: con tu fecha, con tu hora y con tu ciudad.'},
-  {t:'Los hilos', d:'Cada hilo te une con alguien del equipo. Grueso: se mueven mucho el uno al otro. Dorado: fluyen. Azul: cada quien en lo suyo. Violeta: se retan, y eso también enciende. Tócalo y descúbrelo.'},
-  {t:'El cielo de hoy', d:'La Luna y los planetas de hoy recorren el anillo. Cuando la Luna pasa cerca de una estrella, esa persona late. El mapa cambia cada día solo.'},
-  {t:'Sin jerga', d:'Aquí no hay que saber nada: cada cosa está dicha en llano, y el glosario (abajo del mapa) explica los seis términos que importan. Es un juego del equipo, no una evaluación.'},
+  {t:'Tu estrella', d:'Eres una estrella en el mapa. Posición en el anillo: signo solar. Altura: signo lunar. Color del brillo: elemento. Crece en tres etapas: con la fecha, con la hora y con la ciudad.'},
+  {t:'Los hilos', d:'Cada hilo te une con alguien del equipo. Grosor: intensidad del vínculo. Color: dorado afinidad, azul neutral, violeta tensión. Tócalo para descubrirlo y ver sus aspectos.'},
+  {t:'El cielo de hoy', d:'El Sol, la Luna, Venus y Marte de hoy recorren el anillo. Cuando la Luna forma aspecto con una estrella, esa persona late. El mapa cambia cada día solo.'},
+  {t:'Glosario', d:'Siete términos explican todo el mapa: signo solar, signo lunar, ascendente, aspectos, hilos, elementos y cielo de hoy. Está arriba, en Glosario. Es un juego del equipo, no una evaluación.'},
 ];
 
 return {PUNTO, de, ELEMENTO, ELEMENTO_FRASE, ASPECTO_LLANO, tonoLlano, intensidadLlana, porque, pron, PALABRAS, palabra, elementosDe, comparar, climaLlano, fraseDia, GLOSARIO, RECORRIDO};
