@@ -110,7 +110,7 @@ input[inputmode=numeric]{letter-spacing:.4em;text-align:center;font-size:22px}
 .etq.signo{font-family:"Cormorant Garamond",serif;font-size:12px;color:rgba(200,190,240,.6);letter-spacing:.08em;text-transform:uppercase}
 .etq.transito{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.75)}
 .etq.transito.luna{color:var(--oro);font-weight:600}
-.lado{opacity:0;transform:translateX(-18px);transition:opacity .9s ease,transform .9s ease}
+.lado{opacity:0;transform:translateX(-18px);transition:opacity .6s ease,transform .6s ease}
 body.listo .lado{opacity:1;transform:none}
 .lado{position:absolute;left:14px;top:14px;bottom:14px;width:368px;display:flex;flex-direction:column;gap:10px;overflow:auto;z-index:2;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.15) transparent;padding-right:4px}
 .avisos{display:grid;gap:8px}
@@ -189,7 +189,7 @@ details.lectura summary::-webkit-details-marker{display:none}
 @keyframes girar{to{transform:rotateZ(360deg)}}
 @keyframes latir{0%,100%{transform:scale(1)}50%{transform:scale(1.35)}}
 .carga-txt{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:20px;color:var(--ink2);letter-spacing:.02em}
-#nav{transition:opacity .9s ease}
+#nav{transition:opacity .6s ease}
 body:not(.listo) #nav{opacity:0}
 .version{position:fixed;right:14px;bottom:4px;font-size:10px;color:rgba(255,255,255,.35);letter-spacing:.08em;z-index:3;pointer-events:none}
 

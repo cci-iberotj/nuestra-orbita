@@ -10,7 +10,7 @@
    La base se usa SÓLO a través de funciones (rpc) con el código de
    sesión; la tabla no se lee ni se escribe directo.
    ═══════════════════════════════════════════════════════════ */
-import { crearMapa } from './mapa3d.js?v=2.9';
+import { crearMapa } from './mapa3d.js?v=2.10';
 const M = window.Motor, T = window.Textos, L = window.Lecturas;
 const $ = s=>document.querySelector(s);
 const LS = {sesion:'orbita.sesion'};
@@ -78,15 +78,17 @@ function refrescarMapa(){
   $('#aviso-demo').hidden=!demo;
   $('#aviso-solo').hidden=!(conSesion()&&filas&&filas.length===1);
   mapa.poner(lista,{miId:conSesion()?yo.id:null, descubiertos:conSesion()?yo.descubiertos:[]});
-  if(!document.body.classList.contains('listo')) setTimeout(()=>document.body.classList.add('listo'), 2300);
+  if(!document.body.classList.contains('listo')) setTimeout(()=>document.body.classList.add('listo'), 900);
   trHoy=mapa.cielo();
   pintarClima(); pintarMia(); pintarDetalle(seleccion);
 }
 function cerrarSesion(){ sesion=''; yo=null; filas=null; guardar(LS.sesion,null); if(sondeo){ clearInterval(sondeo); sondeo=null; } seleccion=null; document.body.classList.remove('listo'); pintarLado(); refrescarMapa(); puerta('entrar'); }
 async function abrirSesion(codigo){
   sesion=codigo; guardar(LS.sesion,codigo);
-  await cargarMio(); if(!yo) return false;
-  pintarLado(); filas=null; await cargar(true);
+  // lo mío y el mapa se piden al mismo tiempo, no uno tras otro
+  filas=null; const [,r]=await Promise.all([cargarMio(), configurada?rpc('ver_personas',{codigo}).catch(()=>null):null]);
+  if(!yo) return false;
+  pintarLado(); if(r){ filas=r; refrescarMapa(); } else await cargar(true);
   if(sondeo) clearInterval(sondeo);
   sondeo=setInterval(()=>cargar(false), CONFIG.sondeo||15000);
   return true;
@@ -298,8 +300,8 @@ $('#alta-form').addEventListener('submit',async e=>{
     } else {
       const r=await rpc('registrar',Object.assign({pin:datos.pin},args));
       guardar('orbita.conocido','1'); cerrarAlta(); await abrirSesion(r.codigo);
-      setTimeout(()=>mapa.fijar(yo.id),1600);
-      if(yo&&!yo.recorrido&&yo.nivel!=='bastante') setTimeout(()=>abrirRecorrido(),2400);
+      setTimeout(()=>mapa.fijar(yo.id),1400);
+      if(yo&&!yo.recorrido&&yo.nivel!=='bastante') setTimeout(()=>abrirRecorrido(),2000);
     }
   }catch(err){ $('#a-msg').textContent=err.message; }
   $('#a-sig').disabled=false;
@@ -319,7 +321,7 @@ $('#entrar-form').addEventListener('submit',async e=>{
   const nombre=$('#e-nombre').value.trim(), pin=$('#e-pin').value;
   if(!/^\d{4}$/.test(pin)){ $('#e-msg').textContent='El PIN son cuatro números.'; return; }
   $('#e-ok').disabled=true; $('#e-msg').textContent='Abriendo…';
-  try{ const r=await rpc('entrar',{nombre,pin}); guardar('orbita.conocido','1'); $('#e-msg').textContent=''; $('#e-pin').value=''; await abrirSesion(r.codigo); setTimeout(()=>mapa.fijar(yo.id),2600); }
+  try{ const r=await rpc('entrar',{nombre,pin}); guardar('orbita.conocido','1'); $('#e-msg').textContent=''; $('#e-pin').value=''; await abrirSesion(r.codigo); setTimeout(()=>mapa.fijar(yo.id),1600); }
   catch(err){ $('#e-msg').textContent = err.codigo==='28000' ? 'Ese nombre y PIN no coinciden.' : err.message; }
   $('#e-ok').disabled=false;
 });
@@ -372,7 +374,7 @@ async function arrancar(){
   pintarLado();
   document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&conSesion()) cargar(false); });
   setInterval(()=>{ if(mapa&&lista.length){ trHoy=mapa.cielo(); pintarClima(); } },60000);
-  if(sesion){ const ok=await abrirSesion(sesion); if(ok){ setTimeout(()=>mapa.fijar(yo.id),3800); return; } }
+  if(sesion){ const ok=await abrirSesion(sesion); if(ok){ setTimeout(()=>mapa.fijar(yo.id),2000); return; } }
   refrescarMapa(); puerta(leer('orbita.conocido')?'entrar':'alta');
 }
 /* El velo de carga se va cuando el mapa ya tiene con qué dibujarse;

@@ -199,7 +199,7 @@ export function crearMapa(contenedor, {alSeleccionar, alIntro, alIntroFin, semil
       escena.add(g);
       const nodo={p,grupo:g,brillo,nucleo,centro,aro,etiqueta:et,base,pulso:0};
       nodos.push(nodo);
-      if(nuevos.has(p.id)) nacer(nodo, primera? 1.9+i*.12 : 0);
+      if(nuevos.has(p.id)) nacer(nodo, primera? .8+i*.08 : 0);
     });
 
     vinculos.forEach((v,k)=>{
@@ -215,7 +215,7 @@ export function crearMapa(contenedor, {alSeleccionar, alIntro, alIntroFin, semil
       escena.add(linea);
       const hilo={v,k,linea,mat,I,opacidad:.16+.5*I,ancho:1+3.4*I,segmentos:puntos.length-1};
       hilos.push(hilo);
-      if(nuevos.has(v.a.id)||nuevos.has(v.b.id)){ geo.instanceCount=0; animaciones.push({t:0,dur:1.3,retraso:primera?3.0+Math.max(v.i,v.j)*.12:.7,paso:f=>{ geo.instanceCount=Math.round(f*hilo.segmentos); }}); }
+      if(nuevos.has(v.a.id)||nuevos.has(v.b.id)){ geo.instanceCount=0; animaciones.push({t:0,dur:1.3,retraso:primera?1.4+Math.max(v.i,v.j)*.08:.7,paso:f=>{ geo.instanceCount=Math.round(f*hilo.segmentos); }}); }
     });
     conocidos=new Set(lista.map(p=>p.id));
     aplicarEstado();
@@ -225,7 +225,7 @@ export function crearMapa(contenedor, {alSeleccionar, alIntro, alIntroFin, semil
     const b=nodo.base; nodo.brillo.scale.set(0,0,1); nodo.nucleo.scale.set(0,0,0); nodo.etiqueta.style.opacity=0;
     const onda=new THREE.Mesh(new THREE.TorusGeometry(.2,.015,8,48), new THREE.MeshBasicMaterial({color:COLOR.estrella,transparent:true,opacity:.9}));
     nodo.grupo.add(onda);
-    animaciones.push({t:0,dur:1.4,retraso,paso:f=>{
+    animaciones.push({t:0,dur:1.1,retraso,paso:f=>{
       const s=f<.6? b*2.2*(f/.6) : b*(2.2-1.2*((f-.6)/.4)); nodo.brillo.scale.set(s,s,1);
       const n=Math.min(1,f*1.6); nodo.nucleo.scale.set(n,n,n);
       const o=1+f*9; onda.scale.set(o,o,1); onda.material.opacity=.9*(1-f);
@@ -254,7 +254,7 @@ export function crearMapa(contenedor, {alSeleccionar, alIntro, alIntroFin, semil
     const matsAnillo=[]; anillo.traverse(o=>{ if(o.material){ matsAnillo.push([o.material,o.material.opacity]); o.material.transparent=true; o.material.opacity=0; } });
     anillo.traverse(o=>{ if(o.isCSS2DObject) o.element.style.opacity=0; });
     camara.position.copy(controles.target).add(d0.clone().normalize().multiplyScalar(base*0.55));
-    animaciones.push({fija:true,t:0,dur:2.4,retraso:.05,paso:f=>{
+    animaciones.push({fija:true,t:0,dur:1.3,retraso:0,paso:f=>{
       const e=1-Math.pow(1-f,3);
       const escala=s0+(1-s0)*e, dist=0.55+0.45*e;
       anillo.scale.setScalar(escala);
