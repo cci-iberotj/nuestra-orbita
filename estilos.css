@@ -76,6 +76,9 @@ input[inputmode=numeric]{letter-spacing:.4em;text-align:center;font-size:22px}
 .sug button{text-align:left;background:var(--campo);border:1px solid var(--panelline);border-radius:8px;color:inherit;padding:7px 10px;font-size:13px;cursor:pointer}
 .sug button:hover{background:rgba(139,115,236,.25)}
 .fila{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.resumen{display:grid;gap:8px}
+.resumen-fila{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 14px;border:1px solid var(--panelline);border-radius:12px;background:var(--campo)}
+.resumen-fila .k{color:var(--ink3);font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:2px}
 
 /* ============== mapa: toda la ventana, paneles flotando a la izquierda ============== */
 .cabecera{height:60px;padding:0 22px}

@@ -132,7 +132,7 @@ function pintarDetalle(sel, fijo){
   const d=$('#detalle'); if(!conSesion()){ d.innerHTML=''; return; }
   if(!sel){ d.innerHTML=`<h4>Afinidades</h4><p class="vacio small" style="margin:0">Toca una estrella para ver su ficha, o un hilo para ver cómo se llevan dos personas. Arrastra para girar el cielo.</p>`; return; }
   if(sel.tipo==='nodo'){
-    const p=sel.p, c=p.carta, yoMismo=esYo(p);
+    const p=lista.find(x=>x.id===sel.p.id)||sel.p, c=p.carta, yoMismo=esYo(p);   // la versión fresca, por si se corrigió el perfil
     const notas=[p.c||'', p.demo?'persona inventada':'', c.exacta?'':(c.aprox?'hora aproximada: lado emocional casi exacto':'sin hora: lado emocional aproximado'), (c.exacta&&p.lugarSupuesto)?'sin ciudad: se asumió Tijuana':''].filter(Boolean);
     const afines=mapa.vinculos.filter(v=>v.a.id===p.id||v.b.id===p.id).map(v=>Object.assign({otro:v.a.id===p.id?v.b:v.a},v)).sort((a,b)=>b.I-a.I).slice(0,3);
     const v=!yoMismo&&!p.demo?vinculoCon(p.id):null;
@@ -210,30 +210,65 @@ async function buscarCiudad(q,d){
     $('#p-sug').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{ const c=res[+b.dataset.i]; d.ciudad={lat:c.latitude,lon:c.longitude,tz:c.timezone,nombre:`${c.name}, ${c.country||''}`}; $('#p-ciudad').value=d.ciudad.nombre; $('#p-sug').innerHTML=''; }));
   }catch(err){ $('#p-sug').innerHTML='<div class="small vacio">No se pudo buscar la ciudad (¿sin red?). Puedes seguir sin ella.</div>'; }
 }
-const pasosActivos=()=>PASOS.filter(p=>!p.saltar||!p.saltar(datos));
+/* En el alta se recorren todos los pasos. En «Mi perfil» se ve una
+   ficha con cada dato y su botón «Cambiar»: abre sólo ese paso (la
+   hora arrastra la ciudad si hace falta) y guarda al momento. */
+let pasoSolo=null;   // en perfil: id del paso que se edita; null = la ficha
+function pasosActivos(){
+  if(editando){
+    if(pasoSolo==null) return [];
+    const lista=[PASOS.find(p=>p.id===pasoSolo)];
+    if(pasoSolo==='hora' && datos.hora_tipo==='exacta') lista.push(PASOS.find(p=>p.id==='ciudad'));
+    return lista;
+  }
+  return PASOS.filter(p=>!p.saltar||!p.saltar(datos));
+}
+const MESES='enero febrero marzo abril mayo junio julio agosto septiembre octubre noviembre diciembre'.split(' ');
+const FRANJA_TXT={madrugada:'madrugada',manana:'mañana',tarde:'tarde',noche:'noche'};
+function pintarFicha(){
+  const d=datos; const [y,m,dd]=d.fecha.split('-').map(Number);
+  const filas=[
+    ['nombre','Nombre o apodo', d.nombre],
+    ['fecha','Fecha de nacimiento', `${dd} de ${MESES[m-1]} de ${y}`],
+    ['hora','Hora de nacimiento', d.hora_tipo==='exacta'?d.hora:d.hora_tipo==='aprox'?`Más o menos: ${FRANJA_TXT[d.hora_franja]||''}`:'No la sé'],
+    d.hora_tipo==='exacta'?['ciudad','Ciudad', d.ciudad?d.ciudad.nombre:'Sin ciudad (se asume Tijuana)']:null,
+    ['tu','Cómo te hablamos · qué tanto sabes', `${{ella:'Ella',el:'Él',elle:'Elle'}[d.pronombre]} · ${{nada:'nada',algo:'algo',bastante:'bastante'}[d.nivel]}`],
+    ['palabras','Tres palabras', d.palabras.map(k=>T.palabra(k,d.pronombre)).join(', ')||'—'],
+  ].filter(Boolean);
+  $('#avance').parentElement.hidden=true;
+  $('#paso-num').textContent='Tu perfil';
+  $('#paso').innerHTML=`<h2>${d.nombre}</h2><p class="ayuda">Cambia sólo lo que quieras; se guarda al momento.</p><div class="resumen">${filas.map(([id,k,v])=>`<div class="resumen-fila"><div><div class="k">${k}</div><div>${esc(v)}</div></div><button type="button" class="boton mini sec" data-paso="${id}">Cambiar</button></div>`).join('')}</div>`;
+  $('#paso').querySelectorAll('[data-paso]').forEach(b=>b.addEventListener('click',()=>{ pasoSolo=b.dataset.paso; paso=0; pintarPaso(); }));
+  $('#a-msg').textContent=''; $('#a-atras').hidden=true; $('#a-sig').textContent='Cerrar'; $('#a-extras').hidden=false;
+}
 function pintarPaso(){
+  if(editando && pasoSolo==null){ pintarFicha(); return; }
   const activos=pasosActivos(); if(paso>=activos.length) paso=activos.length-1;
   const p=activos[paso];
+  $('#avance').parentElement.hidden=editando;
   $('#avance').style.width=((paso+1)/activos.length*100)+'%';
-  $('#paso-num').textContent=`${editando?'Tu perfil · ':''}paso ${paso+1} de ${activos.length}`;
+  $('#paso-num').textContent= editando ? 'Tu perfil · cambiar' : `paso ${paso+1} de ${activos.length}`;
   $('#paso').innerHTML=`<h2>${p.titulo}</h2><p class="ayuda">${p.ayuda}</p>${p.html(datos)}`;
   if(p.montar) p.montar(datos);
   $('#a-msg').textContent='';
-  $('#a-atras').hidden=paso===0;
-  $('#a-sig').textContent = paso===activos.length-1 ? (editando?'Guardar cambios':'Poner mi estrella') : 'Siguiente';
-  $('#a-extras').hidden=!editando;
+  $('#a-atras').hidden=!editando && paso===0; $('#a-atras').textContent= editando&&paso===0 ? 'Cancelar' : 'Atrás';
+  $('#a-sig').textContent = paso===activos.length-1 ? (editando?'Guardar':'Poner mi estrella') : 'Siguiente';
+  $('#a-extras').hidden=true;
   const inp=$('#paso input'); if(inp&&inp.type!=='date') setTimeout(()=>inp.focus(),50);
 }
+function cargarDatosDeYo(){
+  datos={nombre:yo.nombre,pin:'',fecha:String(yo.fecha).slice(0,10),hora_tipo:yo.hora_tipo||'no',hora:yo.hora?String(yo.hora).slice(0,5):'',hora_franja:yo.hora_franja||null,ciudad:yo.lat!=null?{lat:yo.lat,lon:yo.lon,tz:yo.zona,nombre:yo.ciudad}:null,pronombre:yo.pronombre||'elle',nivel:yo.nivel||'nada',palabras:(yo.palabras||[]).slice()};
+}
 function abrirAlta(editar){
-  editando=!!editar; paso=0;
-  if(editando&&yo){ datos={nombre:yo.nombre,pin:'',fecha:String(yo.fecha).slice(0,10),hora_tipo:yo.hora_tipo||'no',hora:yo.hora?String(yo.hora).slice(0,5):'',hora_franja:yo.hora_franja||null,ciudad:yo.lat!=null?{lat:yo.lat,lon:yo.lon,tz:yo.zona,nombre:yo.ciudad}:null,pronombre:yo.pronombre||'elle',nivel:yo.nivel||'nada',palabras:(yo.palabras||[]).slice()}; }
-  else datos=datosVacios();
+  editando=!!editar; paso=0; pasoSolo=null;
+  if(editando&&yo) cargarDatosDeYo(); else datos=datosVacios();
   $('#alta').hidden=false; pintarPaso();
 }
 function cerrarAlta(){ $('#alta').hidden=true; }
-$('#a-atras').addEventListener('click',()=>{ if(paso>0){ paso--; pintarPaso(); } });
+$('#a-atras').addEventListener('click',()=>{ if(paso>0){ paso--; pintarPaso(); } else if(editando){ cargarDatosDeYo(); pasoSolo=null; pintarPaso(); } });
 $('#alta-form').addEventListener('submit',async e=>{
   e.preventDefault();
+  if(editando && pasoSolo==null){ cerrarAlta(); return; }
   const activos=pasosActivos(); const p=activos[paso];
   const err=p.leer(datos); if(err){ $('#a-msg').textContent=err; return; }
   const activosDespues=pasosActivos();
@@ -246,7 +281,8 @@ $('#alta-form').addEventListener('submit',async e=>{
   try{
     if(editando){
       await rpc('editar',Object.assign({codigo:sesion},args));
-      cerrarAlta(); await cargarMio(); filas=null; await cargar(false); mapa.fijar(yo.id);
+      await cargarMio(); filas=null; await cargar(false);
+      pasoSolo=null; cargarDatosDeYo(); pintarPaso(); $('#a-msg').textContent='Guardado.';
     } else {
       const r=await rpc('registrar',Object.assign({pin:datos.pin},args));
       cerrarAlta(); await abrirSesion(r.codigo);
