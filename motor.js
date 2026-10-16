@@ -65,14 +65,33 @@ function ascendente(date, lat, lon){
   const th = norm(gst+lon)*RAD, eps = 23.4393*RAD, ph = lat*RAD;
   return norm(Math.atan2(Math.cos(th), -(Math.sin(th)*Math.cos(eps)+Math.tan(ph)*Math.sin(eps)))/RAD);
 }
+/* Hora «más o menos»: el centro de cada franja. Afina la Luna (que
+   avanza medio grado por hora) sin fingir un Ascendente, que cambia
+   de signo cada dos horas y con una franja de seis no se sostiene. */
+const FRANJAS = {madrugada:3, manana:9, tarde:15, noche:21};
 function carta(p){
   const exacta = p.h!=null;
+  const aprox = !exacta && !!p.franja;
   const tz = p.tz||TIJUANA.tz, lat = p.lat!=null?p.lat:TIJUANA.lat, lon = p.lon!=null?p.lon:TIJUANA.lon;
-  const fecha = zonedToUTC(p.y,p.m,p.d, exacta?p.h:12, exacta?(p.mi||0):0, tz);
-  const c = {exacta, fecha};
+  const hora = exacta ? p.h : aprox ? FRANJAS[p.franja] : 12;
+  const fecha = zonedToUTC(p.y,p.m,p.d, hora, exacta?(p.mi||0):0, tz);
+  const c = {exacta, aprox, fecha};
   for(const b of ['Sun','Moon','Mercury','Venus','Mars']) c[b]=lonDe(b,fecha);
   c.Asc = exacta ? ascendente(fecha, lat, lon) : null;
   return c;
+}
+/* Qué tan completa está una estrella: 1 sólo fecha · 2 con hora
+   (exacta o más o menos) · 3 hora exacta y ciudad. */
+function etapa(p){
+  if(p.h!=null && p.lat!=null) return 3;
+  if(p.h!=null || p.franja) return 2;
+  return 1;
+}
+function faltante(p){
+  const e=etapa(p);
+  if(e===3) return '';
+  if(e===2) return p.h!=null ? 'Agrega tu ciudad para completar tu primera impresión.' : 'Con tu hora exacta aparece tu primera impresión.';
+  return 'Agrega tu hora, aunque sea más o menos, y tu estrella crece.';
 }
 const signo = l => Math.floor(norm(l)/30);
 const grado = l => Math.floor(norm(l)%30);
@@ -146,14 +165,16 @@ const fraseClima = c => c.pos ? 'día ligero entre ustedes' : 'día de roces que
 function persona(fila){
   const [y,m,d] = String(fila.fecha).slice(0,10).split('-').map(Number);
   let h=null, mi=0;
-  if(fila.hora){ const t=String(fila.hora).split(':').map(Number); h=t[0]; mi=t[1]||0; }
-  const p = {id:fila.id, n:fila.nombre, y,m,d,h,mi, c:fila.ciudad||'', lat:fila.lat, lon:fila.lon, tz:fila.zona||null,
+  if(fila.hora_tipo==='exacta' && fila.hora){ const t=String(fila.hora).split(':').map(Number); h=t[0]; mi=t[1]||0; }
+  const p = {id:fila.id, n:fila.nombre, y,m,d,h,mi, franja: fila.hora_tipo==='aprox' ? fila.hora_franja : null,
+             c:fila.ciudad||'', lat:fila.lat, lon:fila.lon, tz:fila.zona||null, pron:fila.pronombre||'elle',
              lugarSupuesto: fila.lat==null, actualizado:fila.actualizado};
   p.carta = carta(p);
+  p.etapa = etapa(p);
   return p;
 }
 
-return {A, RAD, norm, SIGNOS, GLIFOS, ELEM, MODAL, PLAN, PGL, ASPECTOS, VAL, TIJUANA, DEMO,
-        tzOffsetMin, zonedToUTC, lonDe, ascendente, carta, signo, grado, fmt, elemDe, colorElem,
+return {A, RAD, norm, SIGNOS, GLIFOS, ELEM, MODAL, PLAN, PGL, ASPECTOS, VAL, TIJUANA, DEMO, FRANJAS,
+        tzOffsetMin, zonedToUTC, lonDe, ascendente, carta, etapa, faltante, signo, grado, fmt, elemDe, colorElem,
         sep, aspecto, esLum, orbe, intensidad, banda, compatElem, armonia, tono, cielo, climaPareja, fraseClima, persona};
 })();

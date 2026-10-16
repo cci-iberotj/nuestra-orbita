@@ -1,14 +1,15 @@
 # Constelación
 ### El mapa de afinidades del equipo · Diseño y Medios, IBERO Tijuana
 
-Cada quien registra su fecha, hora y ciudad de nacimiento, y el equipo
-aparece como una constelación: cada persona es una estrella en el grado
-de su Sol y los hilos entre estrellas son la sinastría (grosor =
-intensidad, color = tono). La Luna y los planetas de hoy recorren el
-anillo y encienden a quien tocan.
+Cada quien del equipo es una estrella en una bóveda 3D: alrededor del
+anillo va su signo, en altura su lado emocional, y brilla con el color
+de su elemento. Los hilos entre estrellas son qué tanto se mueven dos
+personas la una a la otra (grosor) y cómo se llevan (color). La Luna y
+los planetas de hoy recorren el anillo y encienden a quien tocan.
 
 Es cosa del equipo, no herramienta de trabajo: **no vive en LA PIZARRA
-ni comparte con ella base, clave ni dirección.**
+ni comparte con ella base, clave ni dirección.** Y está escrito para
+quien no sabe nada de horóscopos: todo en llano, con recorrido y glosario.
 
 ---
 
@@ -16,51 +17,55 @@ ni comparte con ella base, clave ni dirección.**
 
 # https://cci-iberotj.github.io/constelacion/
 
-Pide la **clave del equipo** una sola vez; el navegador la recuerda.
-Es la misma para todos y sólo sirve para ver el mapa.
+Sin clave general. Cada quien crea su estrella con su **nombre o apodo y
+un PIN de cuatro números**; el navegador lo recuerda y desde otro
+teléfono se entra con el mismo nombre y PIN. Quien lo olvide lo cambia
+desde la base (abajo). No hay correo ni contraseña.
 
-## Registrarse
+Sin sesión la página enseña un **mapa de muestra** con ocho personas
+inventadas (llevan un punto tras el nombre).
 
-En el panel «Tu estrella»: nombre o apodo, fecha (obligatoria), hora
-(si la sabes) y ciudad (escribe y elige de la lista). El propio
-formulario dice qué se pierde sin hora o sin ciudad.
+## El alta, por pasos
 
-Al guardar aparece **tu enlace personal** (`?c=` + ocho letras). Con él
-corriges o borras tu estrella desde cualquier dispositivo; no hay cuenta
-ni contraseña. En el navegador donde te registraste queda guardado solo.
+1. Nombre o apodo + PIN.
+2. Fecha de nacimiento (lo único indispensable).
+3. ¿Sabes a qué hora? Sí exacta · más o menos (madrugada, mañana, tarde,
+   noche) · no. Con «más o menos» el lado emocional sale casi exacto.
+4. Ciudad (sólo si dio hora exacta: es lo que da la primera impresión).
+5. Cómo te hablamos (ella / él / elle) y qué tanto sabes de esto
+   (decide si el recorrido sale solo).
+6. Tres palabras que te describan: al terminar, el mapa las compara con
+   lo que dice la carta.
 
-El mapa enseña signos y grados; la fecha y la hora no se muestran a nadie.
+La estrella **crece en tres etapas**: fecha → hora → hora exacta y ciudad.
+Los hilos **se descubren** tocándolos (o tocando la estrella de alguien y
+«Descubrir nuestro hilo»); el panel «tu estrella» lleva la cuenta.
 
-## Demostración
-
-Mientras la tabla está vacía el mapa enseña ocho personas **inventadas**
-(con un punto tras el nombre y un aviso). En cuanto alguien se registra,
-desaparecen.
+«Mi perfil» (arriba a la derecha) corrige todo, cambia el PIN, cierra la
+sesión en ese navegador o borra la estrella.
 
 ---
 
 ## Dónde viven los datos
 
-En un proyecto de Supabase **propio** de Constelación (la referencia está
-en `config.js`). Una tabla, `personas`, que no se puede leer ni escribir
-directo desde el navegador: todo pasa por funciones que piden la clave
-del equipo (para ver y para registrarse) o el código personal (para
-corregir y borrar). Está explicado en `supabase/esquema.sql`.
+En un proyecto de Supabase **propio** de Constelación (`config.js` trae
+la referencia). Una tabla, `personas`, que no se puede leer ni escribir
+directo desde el navegador: todo pasa por funciones que piden el código
+de sesión (lo que se recibe al registrarse o al entrar con nombre + PIN).
+El PIN se guarda cifrado. Está explicado en `supabase/esquema.sql`.
 
 Correr SQL contra esa base, sin entrar al tablero de Supabase:
 
-    python supabase/correr.py esquema.sql
+    python supabase/correr.py esquema.sql --si-borra
     python supabase/correr.py "select nombre, ciudad, creado from personas"
 
 Necesita el token de cuenta en `datos/token_supabase.txt` (la carpeta
 `datos/` no se sube a GitHub). El script se niega a correr cualquier
 cosa que borre, salvo que se le agregue `--si-borra`.
 
-### Cambiar la clave del equipo
+### Reiniciar el PIN de alguien
 
-    python supabase/correr.py "update ajustes set valor = 'la-nueva' where nombre = 'clave'"
-
-A quien tenga la vieja guardada se le vuelve a pedir al instante.
+    python supabase/correr.py "select cambiar_pin(codigo, '1234') from personas where nombre_clave = 'apodo'"
 
 ---
 
@@ -72,7 +77,8 @@ A quien tenga la vieja guardada se le vuelve a pedir al instante.
 
 `empujar.py` sube por la API de GitHub (la red de IBERO bloquea
 github.com pero no api.github.com), igual que en LA PIZARRA. GitHub Pages
-publica solo en cerca de un minuto.
+publica solo en cerca de un minuto; los `.js` se quedan en caché del
+navegador hasta diez minutos.
 
 ---
 
@@ -80,16 +86,18 @@ publica solo en cerca de un minuto.
 
 | | |
 |---|---|
-| `index.html` | la página: puerta, mapa y panel «Tu estrella» |
-| `motor.js` | el cálculo: cartas, aspectos, intensidad (Discepolo), tono, tránsitos |
-| `mapa.js` | el dibujo: anillo, estrellas, hilos, clima del día, animación de nacer |
-| `app.js` | clave, lectura de la base, alta, enlace personal, sondeo cada 15 s |
-| `estilos.css` | estilos |
+| `index.html` | la página: mapa, entrada, alta por pasos, glosario, recorrido |
+| `motor.js` | el cálculo: cartas, aspectos, intensidad (Discepolo), tono, tránsitos, etapas |
+| `textos.js` | todo lo dicho en llano: puntos de la carta, vínculos, glosario, recorrido, las doce palabras |
+| `mapa3d.js` | la bóveda en Three.js: anillo, estrellas, hilos, cielo de hoy, nacer |
+| `app.js` | sesión, alta, paneles, descubrimientos, sondeo cada 15 s |
+| `estilos.css` | estilos (noche siempre; sin ajustes para quien entra) |
 | `config.js` | URL y llave publicable del proyecto de Supabase |
 | `concepto.html` | el estudio de concepto original, con la explicación de todo |
-| `supabase/esquema.sql` | tablas, funciones y permisos |
+| `supabase/esquema.sql` | tabla, funciones y permisos |
 | `supabase/correr.py` | correr SQL desde aquí |
 | `empujar.py` | publicar |
 
 Cálculo en el navegador con [astronomy-engine](https://www.npmjs.com/package/astronomy-engine)
-(MIT); ciudades con [Open-Meteo](https://open-meteo.com/en/docs/geocoding-api) (sin llave).
+(MIT); 3D con [three.js](https://threejs.org) (MIT); ciudades con
+[Open-Meteo](https://open-meteo.com/en/docs/geocoding-api) (sin llave).
