@@ -82,7 +82,7 @@ export function crearMapa(contenedor, {alSeleccionar, alIntro, alIntroFin, semil
   const camara=new THREE.PerspectiveCamera(42, 1, 0.1, 200);
   camara.position.set(0, 6.2, 12);
   const renderer=new THREE.WebGLRenderer({antialias:true, powerPreference:'high-performance'});
-  renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+  renderer.setPixelRatio(Math.min(devicePixelRatio,1.5));   // en pantallas 2x, 1.5 basta y cuesta la mitad
   renderer.toneMapping=THREE.ACESFilmicToneMapping; renderer.toneMappingExposure=1.05;
   renderer.domElement.className='lienzo';
   contenedor.appendChild(renderer.domElement);
@@ -136,21 +136,32 @@ export function crearMapa(contenedor, {alSeleccionar, alIntro, alIntroFin, semil
     }
   }
 
-  /* ---------- precalentar ----------
+  /* ---------- precalentar, sin congelar ----------
      La primera vez que aparece un material, el navegador compila su
-     programa y el cuadro se atora. Se dibuja un cuadro de mentira con
-     uno de cada cosa (estrella, hilo, resplandor) para pagar eso ahora,
-     mientras el velo de carga tapa la pantalla. */
-  {
-    const dummy=new THREE.Group();
-    dummy.add(new THREE.Sprite(new THREE.SpriteMaterial({map:BRILLO,color:0xffffff,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending})));
-    dummy.add(new THREE.Mesh(new THREE.SphereGeometry(.05,8,8), new THREE.MeshBasicMaterial({color:0xffffff})));
-    dummy.add(new THREE.Mesh(new THREE.TorusGeometry(.2,.01,6,24), new THREE.MeshBasicMaterial({color:0xffffff,transparent:true})));
-    const lg=new LineGeometry(); lg.setPositions([0,0,0,1,0,0,2,1,0]);
-    const lm=new LineMaterial({color:0xffffff,linewidth:2,transparent:true,opacity:.5,depthWrite:false,blending:THREE.AdditiveBlending}); lm.resolution.set(2,2);
-    dummy.add(new Line2(lg,lm));
-    escena.add(dummy); renderer.setSize(2,2); compositor.setSize(2,2); compositor.render(); escena.remove(dummy);
-  }
+     programa y el cuadro se atora. Aquí se compila TODO antes de
+     enseñar nada: un cuadro de mentira con uno de cada cosa (estrella,
+     hilo, resplandor) más el anillo y el fondo encendidos un instante.
+     Con compileAsync la compilación corre en paralelo y la estrella de
+     carga sigue latiendo; mientras tanto el bucle no dibuja. */
+  let caliente=false; let avisarCaliente=null; const listo=new Promise(r=>avisarCaliente=r);
+  (async()=>{
+    await null;   // siempre después de que todo lo de abajo exista
+    try{
+      const dummy=new THREE.Group();
+      dummy.add(new THREE.Sprite(new THREE.SpriteMaterial({map:BRILLO,color:0xffffff,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending})));
+      dummy.add(new THREE.Mesh(new THREE.SphereGeometry(.05,8,8), new THREE.MeshBasicMaterial({color:0xffffff})));
+      dummy.add(new THREE.Mesh(new THREE.TorusGeometry(.2,.01,6,24), new THREE.MeshBasicMaterial({color:0xffffff,transparent:true})));
+      const lg=new LineGeometry(); lg.setPositions([0,0,0,1,0,0,2,1,0]);
+      const lm=new LineMaterial({color:0xffffff,linewidth:2,transparent:true,opacity:.5,depthWrite:false,blending:THREE.AdditiveBlending}); lm.resolution.set(2,2);
+      dummy.add(new Line2(lg,lm));
+      escena.add(dummy); anillo.visible=true; fondo.visible=true;
+      if(renderer.compileAsync) await renderer.compileAsync(escena,camara); else renderer.compile(escena,camara);
+      renderer.setSize(2,2); compositor.setSize(2,2); compositor.render();   // los programas del resplandor
+      escena.remove(dummy); anillo.visible=false; fondo.visible=false;
+      redimensionar();
+    }catch(e){ console.warn('precalentado', e); }
+    caliente=true; avisarCaliente();
+  })();
 
   /* ---------- estado ---------- */
   let lista=[], vinculos=[], nodos=[], hilos=[], P=[];
@@ -345,7 +356,7 @@ export function crearMapa(contenedor, {alSeleccionar, alIntro, alIntroFin, semil
     const panel = w>900 ? 390 : 0;
     camara.aspect=(w+panel)/h; camara.setViewOffset(w+panel,h,0,0,w,h); camara.updateProjectionMatrix();
     renderer.setSize(w,h); compositor.setSize(w,h); etiquetas.setSize(w,h);
-    bloom.resolution.set(w,h); hilos.forEach(x=>x.mat.resolution.set(w,h));
+    bloom.resolution.set(Math.round(w/2),Math.round(h/2)); hilos.forEach(x=>x.mat.resolution.set(w,h));   // el resplandor a media resolución: no se nota y cuesta un cuarto
     // cuánto cielo tiene que caber: el anillo con sus glifos (≈13 u) y algo de aire
     const libre=w-panel, asp=libre/h, tanV=Math.tan(camara.fov/2*RAD);
     const anchoVisible = libre>=h ? 13/0.74 : 13/0.96;
@@ -362,6 +373,8 @@ export function crearMapa(contenedor, {alSeleccionar, alIntro, alIntroFin, semil
   let vivo=true;
   function cuadro(){
     if(!vivo) return; requestAnimationFrame(cuadro);
+    if(!caliente){ reloj.getDelta(); return; }   // todavía compilando: no se dibuja
+    { const ahora=performance.now(); const P=window.__perf||(window.__perf={inicio:ahora,cuadros:0,peor:0,huecos:[]}); if(P.ultimo){ const g=ahora-P.ultimo; if(g>P.peor) P.peor=g; if(g>40) P.huecos.push([Math.round(ahora-P.inicio),Math.round(g)]); } P.ultimo=ahora; P.cuadros++; }
     const dt=Math.min(reloj.getDelta(),.05), t=reloj.elapsedTime;
     fondo.rotation.y+=dt*.004;
     nodos.forEach((n,i)=>{
@@ -370,7 +383,7 @@ export function crearMapa(contenedor, {alSeleccionar, alIntro, alIntroFin, semil
       if(n.aro){ n.aro.rotation.y=t*.6; n.aro.rotation.x=Math.sin(t*.4)*.5; }
     });
     if(nodos.length){ // los hilos siguen a las estrellas que respiran
-      hilos.forEach(h=>{ const a=nodos[h.v.i].grupo.position, b=nodos[h.v.j].grupo.position; const medio=a.clone().add(b).multiplyScalar(.5); const control=medio.clone().multiplyScalar(.55); control.y=medio.y+.35; moverLinea(h.linea.geometry, new THREE.QuadraticBezierCurve3(a,control,b).getPoints(36)); });
+      hilos.forEach(h=>moverLinea(h.linea.geometry, nodos[h.v.i].grupo.position, nodos[h.v.j].grupo.position));
     }
     // las animaciones van con el reloj de verdad, no con los cuadros:
     // en un teléfono lento duran lo mismo, sólo que a saltos
@@ -381,9 +394,19 @@ export function crearMapa(contenedor, {alSeleccionar, alIntro, alIntroFin, semil
   const easeOut=f=>1-Math.pow(1-f,3);
   /* Escribe los puntos nuevos sobre el mismo búfer de la línea (el
      formato es inicio-fin por segmento) sin crear uno cada cuadro. */
-  function moverLinea(geo, pts){
-    const buf=geo.attributes.instanceStart.data; const arr=buf.array;
-    for(let i=0;i<pts.length-1;i++){ const o=i*6; arr[o]=pts[i].x; arr[o+1]=pts[i].y; arr[o+2]=pts[i].z; arr[o+3]=pts[i+1].x; arr[o+4]=pts[i+1].y; arr[o+5]=pts[i+1].z; }
+  function moverLinea(geo, a, b){
+    // la misma curva que al construir (control hacia el centro y un poco
+    // arriba), escrita directo en el búfer: cero objetos nuevos por cuadro
+    const buf=geo.attributes.instanceStart.data; const arr=buf.array; const n=36;
+    const mx=(a.x+b.x)/2, my=(a.y+b.y)/2, mz=(a.z+b.z)/2;
+    const cx=mx*.55, cy=my+.35, cz=mz*.55;
+    let px=a.x, py=a.y, pz=a.z;
+    for(let i=1;i<=n;i++){
+      const t=i/n, u=1-t, w0=u*u, w1=2*u*t, w2=t*t;
+      const x=w0*a.x+w1*cx+w2*b.x, y=w0*a.y+w1*cy+w2*b.y, z=w0*a.z+w1*cz+w2*b.z;
+      const o=(i-1)*6; arr[o]=px; arr[o+1]=py; arr[o+2]=pz; arr[o+3]=x; arr[o+4]=y; arr[o+5]=z;
+      px=x; py=y; pz=z;
+    }
     buf.needsUpdate=true;
   }
   cuadro();
@@ -391,6 +414,7 @@ export function crearMapa(contenedor, {alSeleccionar, alIntro, alIntroFin, semil
   /* ---------- lo que usa la aplicación ---------- */
   return {
     poner(nueva, {miId:yo, descubiertos:desc}={}){
+      if(!caliente){ listo.then(()=>this.poner(nueva,{miId:yo,descubiertos:desc})); return; }
       if(yo!==undefined) miId=yo; if(desc) descubiertos=new Set(desc);
       const f=nueva.map(p=>[p.id,p.actualizado||'',p.etapa||''].join('|')).join(';')+'#'+miId+'#'+[...descubiertos].join(',');
       if(f===firma) return;

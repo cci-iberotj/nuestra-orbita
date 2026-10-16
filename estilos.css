@@ -3,7 +3,7 @@
   --sky1:#0b1026; --sky2:#151a3d; --sky3:#2a1d5a;
   --ink:#ece8ff; --ink2:#c3bce0; --ink3:#8f88b4;
   --acc:#8b73ec; --acc2:#ffd79a;
-  --panel:rgba(20,22,52,.72); --panelline:rgba(255,255,255,.12); --campo:rgba(127,127,190,.14);
+  --panel:rgba(20,22,52,.9); --panelline:rgba(255,255,255,.12); --campo:rgba(127,127,190,.14);
   --fuego:#ffb36b; --tierra:#a8e6a1; --aire:#a9d8ff; --agua:#c9b0ff;
   --oro:#ffd79a; --violeta:#d4a6ff; --azul:#9fd3ff;
   --r:18px;
@@ -40,7 +40,7 @@ footer{padding:28px 22px 60px;color:var(--ink3);font-size:12px;text-align:center
 
 /* ============== tarjetas / formularios ============== */
 .pantalla.centrada{min-height:60vh;display:grid;place-items:center;padding:16px}
-.tarjeta{background:var(--panel);backdrop-filter:blur(16px);border:1px solid var(--panelline);border-radius:22px;padding:28px 26px;width:min(400px,100%);display:grid;gap:14px;box-shadow:0 30px 70px -40px rgba(0,0,0,.8)}
+.tarjeta{background:var(--panel);border:1px solid var(--panelline);border-radius:22px;padding:28px 26px;width:min(400px,100%);display:grid;gap:14px;box-shadow:0 30px 70px -40px rgba(0,0,0,.8)}
 .tarjeta.ancha{width:min(560px,100%)}
 .tarjeta{position:relative}
 .cerrar{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:50%;border:1px solid var(--panelline);background:rgba(255,255,255,.04);color:var(--ink2);font-size:20px;line-height:1;cursor:pointer;display:grid;place-items:center;transition:.15s}
@@ -110,11 +110,11 @@ input[inputmode=numeric]{letter-spacing:.4em;text-align:center;font-size:22px}
 .etq.signo{font-family:"Cormorant Garamond",serif;font-size:12px;color:rgba(200,190,240,.6);letter-spacing:.08em;text-transform:uppercase}
 .etq.transito{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.75)}
 .etq.transito.luna{color:var(--oro);font-weight:600}
-.lado{opacity:0;transform:translateX(-18px);transition:opacity .6s ease,transform .6s ease}
+.lado{opacity:0;transform:translateX(-18px);transition:opacity .6s ease,transform .6s ease;will-change:opacity,transform}
 body.listo .lado{opacity:1;transform:none}
 .lado{position:absolute;left:14px;top:14px;bottom:14px;width:368px;display:flex;flex-direction:column;gap:10px;overflow:auto;z-index:2;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.15) transparent;padding-right:4px}
 .avisos{display:grid;gap:8px}
-.aviso{padding:10px 14px;border-radius:12px;background:rgba(255,215,154,.12);border:1px solid rgba(255,215,154,.3);font-size:13px;backdrop-filter:blur(8px)}
+.aviso{padding:10px 14px;border-radius:12px;background:rgba(60,50,40,.92);border:1px solid rgba(255,215,154,.3);font-size:13px;}
 .pista{position:absolute;bottom:12px;left:400px;right:16px;text-align:center;font-size:12px;color:rgba(255,255,255,.45);pointer-events:none;letter-spacing:.04em}
 .pie{color:var(--ink3);font-size:11px;line-height:1.5;padding:4px 6px;margin-top:auto}
 @media (max-width:900px){
@@ -124,7 +124,7 @@ body.listo .lado{opacity:1;transform:none}
   .lado{position:static;width:auto;padding:12px 12px 28px;overflow:visible}
   .pista{left:0;right:0}
 }
-.panel{background:var(--panel);backdrop-filter:blur(14px);border:1px solid var(--panelline);border-radius:18px;padding:16px 18px;font-size:14px}
+.panel{background:var(--panel);border:1px solid var(--panelline);border-radius:18px;padding:16px 18px;font-size:14px}
 .panel:empty{display:none}
 .panel .k{color:var(--ink3);font-size:11px;letter-spacing:.14em;text-transform:uppercase}
 .panel .ficha{display:grid;grid-template-columns:auto 1fr;gap:5px 12px;margin:8px 0}
@@ -183,7 +183,7 @@ details.lectura summary::-webkit-details-marker{display:none}
 .carga-txt{position:absolute;left:50%;top:calc(50% + 72px);transform:translateX(-50%);white-space:nowrap}
 @media (min-width:901px){.carga-cielo,.carga-txt{left:calc(50% + 195px)}}
 .carga-cielo .estrella{position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:#fff;box-shadow:0 0 18px 6px rgba(255,215,154,.55),0 0 60px 20px rgba(212,166,255,.25);animation:latir 2.2s ease-in-out infinite}
-.carga-cielo .anillo{position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(215,205,255,.75);box-shadow:0 0 14px rgba(200,190,240,.35),inset 0 0 14px rgba(200,190,240,.18);transform:rotateX(62deg);transform-origin:50% 50%}
+.carga-cielo .anillo{position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(215,205,255,.75);box-shadow:0 0 14px rgba(200,190,240,.35);transform:rotateX(62deg);transform-origin:50% 50%;will-change:transform,opacity}
 .carga-cielo .giro{position:absolute;inset:0;animation:girar 3.2s linear infinite}
 .carga-cielo .punto{position:absolute;left:50%;top:-3px;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:var(--oro);box-shadow:0 0 10px 3px rgba(255,215,154,.6)}
 @keyframes girar{to{transform:rotateZ(360deg)}}
@@ -194,7 +194,7 @@ body:not(.listo) #nav{opacity:0}
 .version{position:fixed;right:14px;bottom:4px;font-size:10px;color:rgba(255,255,255,.35);letter-spacing:.08em;z-index:3;pointer-events:none}
 
 /* ============== velos ============== */
-.velo{position:fixed;inset:0;background:rgba(5,7,24,.72);backdrop-filter:blur(6px);display:grid;place-items:center;padding:16px;z-index:50;overflow:auto}
+.velo{position:fixed;inset:0;background:rgba(5,7,24,.86);display:grid;place-items:center;padding:16px;z-index:50;overflow:auto}
 .velo .tarjeta{max-height:calc(100vh - 32px);overflow:auto}
 #entrada .intro{font-size:14px}
 .tarjeta.recorrido{width:min(440px,100%)}
