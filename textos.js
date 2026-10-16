@@ -119,6 +119,21 @@ function fraseDia(cl){
   }).join(' ');
 }
 
+/* ---------- la estrella de cada quien, explicada ----------
+   «Acuario, signo de aire (ideas): por eso tu estrella brilla en azul
+   claro. Signo lunar Virgo (tierra). Ascendente Leo (fuego).» */
+const COLOR_ELEMENTO = {fuego:'naranja', tierra:'verde', aire:'azul claro', agua:'violeta'};
+function descripcionEstrella(c, tu){
+  const sol=M.SIGNOS[M.signo(c.Sun)], e=M.elemDe(c.Sun);
+  const quien = tu ? 'tu estrella' : 'su estrella';
+  let t = `${sol}, signo de ${ELEMENTO_FRASE[e]}: por eso ${quien} brilla en ${COLOR_ELEMENTO[e]}.`;
+  t += ` Signo lunar ${M.SIGNOS[M.signo(c.Moon)]} (${M.elemDe(c.Moon)})${c.exacta?'':', aproximado'}.`;
+  if(c.Asc!=null) t += ` Ascendente ${M.SIGNOS[M.signo(c.Asc)]} (${M.elemDe(c.Asc)}).`;
+  const orden=elementosDe(c); const dom=orden[0][0];
+  if(dom!==e) t += ` En el conjunto de la carta pesa más el elemento ${dom}.`;
+  return t;
+}
+
 /* ---------- glosario ---------- */
 const GLOSARIO = [
   {t:'Signo solar', d:'El signo de siempre: dónde estaba el Sol el día que naciste. Representa la esencia. En el mapa marca la posición de la estrella en el anillo.'},
@@ -138,5 +153,5 @@ const RECORRIDO = [
   {t:'Glosario', d:'Siete términos explican todo el mapa: signo solar, signo lunar, ascendente, aspectos, hilos, elementos y cielo de hoy. Está arriba, en Glosario. Es un juego del equipo, no una evaluación.'},
 ];
 
-return {PUNTO, de, ELEMENTO, ELEMENTO_FRASE, ASPECTO_LLANO, tonoLlano, intensidadLlana, porque, pron, PALABRAS, palabra, elementosDe, comparar, climaLlano, fraseDia, GLOSARIO, RECORRIDO};
+return {PUNTO, de, ELEMENTO, ELEMENTO_FRASE, ASPECTO_LLANO, tonoLlano, intensidadLlana, porque, pron, PALABRAS, palabra, elementosDe, comparar, climaLlano, fraseDia, descripcionEstrella, GLOSARIO, RECORRIDO};
 })();

@@ -23,5 +23,5 @@ const CONFIG = {
   sondeo: 15000,
   /* La sube publicar.py en cada publicación; se ve abajo a la
      izquierda y hace que el navegador pida los archivos nuevos. */
-  version: '2.5',
+  version: '2.6',
 };

@@ -10,7 +10,7 @@
    La base se usa SÓLO a través de funciones (rpc) con el código de
    sesión; la tabla no se lee ni se escribe directo.
    ═══════════════════════════════════════════════════════════ */
-import { crearMapa } from './mapa3d.js?v=2.5';
+import { crearMapa } from './mapa3d.js?v=2.6';
 const M = window.Motor, T = window.Textos;
 const $ = s=>document.querySelector(s);
 const LS = {sesion:'orbita.sesion'};
@@ -107,6 +107,7 @@ function pintarMia(){
   const comp=T.comparar(yo.palabras,p.carta,yo.pronombre);
   const falta=M.faltante(p);
   $('#mia').innerHTML=`<h4>${yo.nombre} <span class="muted" style="font-size:14px;font-family:Manrope">· tu estrella</span></h4>
+    <div class="small" style="margin-bottom:10px">${T.descripcionEstrella(p.carta,true)}</div>
     <div class="k">Etapa ${p.etapa} de 3</div>
     <div class="etapas"><i class="${p.etapa>=1?'on':''}"></i><i class="${p.etapa>=2?'on':''}"></i><i class="${p.etapa>=3?'on':''}"></i></div>
     <div class="small">${falta||'Perfil completo: signo solar, signo lunar y ascendente.'}</div>
