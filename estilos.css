@@ -28,15 +28,23 @@ button{font:inherit}
 .marca{text-decoration:none;color:inherit;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .marca b{font-family:"Cormorant Garamond",serif;font-weight:500;font-size:30px;letter-spacing:.01em}
 .marca span{font-family:"Cormorant Garamond",serif;font-style:italic;color:var(--ink2);font-size:18px}
-.cabecera nav{display:flex;gap:6px}
-.cabecera nav button{background:transparent;border:1px solid var(--panelline);color:var(--ink2);border-radius:999px;padding:7px 14px;font-size:13px;cursor:pointer}
-.cabecera nav button:hover{color:var(--ink);border-color:rgba(255,255,255,.3)}
+.cabecera nav{display:flex;gap:4px;align-items:center}
+.nav-liga{background:transparent;border:0;color:var(--ink3);border-radius:999px;padding:7px 12px;font-size:13px;cursor:pointer;text-decoration:underline;text-decoration-color:transparent;text-underline-offset:4px;transition:.15s}
+.nav-liga:hover{color:var(--ink);text-decoration-color:var(--acc2)}
+.nav-perfil{display:inline-flex;align-items:center;gap:8px;margin-left:6px;background:rgba(139,115,236,.18);border:1px solid rgba(139,115,236,.55);color:#fff;border-radius:999px;padding:7px 14px 7px 10px;font-size:13px;font-weight:600;cursor:pointer;max-width:180px;transition:.15s}
+.nav-perfil span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nav-perfil:hover{background:rgba(139,115,236,.32);border-color:var(--acc)}
+.nav-perfil .chispa{width:10px;height:10px;border-radius:50%;background:#fff;box-shadow:0 0 10px 3px rgba(255,215,154,.6);flex:none}
+button:focus-visible,input:focus-visible{outline:2px solid var(--acc2);outline-offset:2px}
 footer{padding:28px 22px 60px;color:var(--ink3);font-size:12px;text-align:center;max-width:70ch;margin:0 auto}
 
 /* ============== tarjetas / formularios ============== */
 .pantalla.centrada{min-height:60vh;display:grid;place-items:center;padding:16px}
 .tarjeta{background:var(--panel);backdrop-filter:blur(16px);border:1px solid var(--panelline);border-radius:22px;padding:28px 26px;width:min(400px,100%);display:grid;gap:14px;box-shadow:0 30px 70px -40px rgba(0,0,0,.8)}
 .tarjeta.ancha{width:min(560px,100%)}
+.tarjeta{position:relative}
+.cerrar{position:absolute;top:10px;right:10px;width:34px;height:34px;border-radius:50%;border:1px solid var(--panelline);background:rgba(255,255,255,.04);color:var(--ink2);font-size:20px;line-height:1;cursor:pointer;display:grid;place-items:center;transition:.15s}
+.cerrar:hover{background:rgba(255,255,255,.12);color:#fff}
 .intro{color:var(--ink2);font-size:15px;margin:0}
 form{display:grid;gap:12px}
 label{display:grid;gap:6px;font-size:13px;color:var(--ink2);letter-spacing:.02em}
@@ -47,7 +55,9 @@ input[inputmode=numeric]{letter-spacing:.4em;text-align:center;font-size:22px}
 .boton:hover{filter:brightness(1.1)} .boton:active{transform:scale(.98)}
 .boton:disabled{opacity:.5;cursor:default}
 .boton.sec{background:transparent;border:1px solid var(--panelline);color:var(--ink)}
+.boton.sec:hover{border-color:rgba(255,255,255,.35);background:rgba(255,255,255,.05)}
 .enlace{background:none;border:0;color:var(--ink2);text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:4px 0;font-size:13px}
+.enlace:hover{color:#fff}
 .enlace.peligro{color:#ffa0a0}
 .msg{min-height:1.3em;font-size:13px;color:var(--acc2)}
 .o{text-align:center;color:var(--ink3);font-size:13px;position:relative}
@@ -66,9 +76,11 @@ input[inputmode=numeric]{letter-spacing:.4em;text-align:center;font-size:22px}
 .opcion{background:var(--campo);border:1px solid var(--panelline);border-radius:14px;padding:12px 14px;cursor:pointer;color:var(--ink);text-align:left;display:grid;gap:2px;transition:border-color .15s,background .15s}
 .opcion b{font-weight:600}
 .opcion small{color:var(--ink3);font-size:12px}
+.opcion:hover{border-color:rgba(255,255,255,.3)}
 .opcion.on{border-color:var(--acc2);background:rgba(255,215,154,.1)}
 .chips{display:flex;flex-wrap:wrap;gap:8px}
 .chip{background:var(--campo);border:1px solid var(--panelline);border-radius:999px;padding:8px 14px;cursor:pointer;color:var(--ink);font-size:14px;transition:.15s}
+.chip:hover:not(:disabled){border-color:rgba(255,255,255,.3)}
 .chip.on{background:rgba(255,215,154,.14);border-color:var(--acc2);color:#fff}
 .chip:disabled{opacity:.4;cursor:default}
 .contador{font-size:12px;color:var(--ink3);text-align:right}
@@ -77,6 +89,7 @@ input[inputmode=numeric]{letter-spacing:.4em;text-align:center;font-size:22px}
 .sug button:hover{background:rgba(139,115,236,.25)}
 .fila{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .resumen{display:grid;gap:8px}
+.resumen-fila:hover{border-color:rgba(255,255,255,.25)}
 .resumen-fila{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:10px 14px;border:1px solid var(--panelline);border-radius:12px;background:var(--campo)}
 .resumen-fila .k{color:var(--ink3);font-size:11px;letter-spacing:.14em;text-transform:uppercase;margin-bottom:2px}
 

@@ -10,7 +10,7 @@
    La base se usa SÓLO a través de funciones (rpc) con el código de
    sesión; la tabla no se lee ni se escribe directo.
    ═══════════════════════════════════════════════════════════ */
-import { crearMapa } from './mapa3d.js?v=2.2';
+import { crearMapa } from './mapa3d.js?v=2.3';
 const M = window.Motor, T = window.Textos;
 const $ = s=>document.querySelector(s);
 const LS = {sesion:'orbita.sesion'};
@@ -41,6 +41,7 @@ let trHoy=null;
 /* ---------- pantallas ---------- */
 function conSesion(){ return !!(yo&&sesion); }
 function pintarLado(){
+  $('#nav-nombre').textContent = yo ? yo.nombre : 'Mi perfil';
   $('#entrada').hidden=conSesion();
   ['#detalle','#mia','#clima'].forEach(s=>$(s).hidden=!conSesion());
   $('#nav').hidden=!conSesion();
@@ -109,7 +110,7 @@ function pintarMia(){
     <div class="k">Etapa ${p.etapa} de 3</div>
     <div class="etapas"><i class="${p.etapa>=1?'on':''}"></i><i class="${p.etapa>=2?'on':''}"></i><i class="${p.etapa>=3?'on':''}"></i></div>
     <div class="small">${falta||'Tu estrella está completa: signo, lado emocional y primera impresión.'}</div>
-    ${falta?'<div class="cta"><button type="button" class="boton mini sec" id="mia-completar">Completar mi perfil</button></div>':''}
+    ${falta?'<div class="cta"><button type="button" class="boton mini" id="mia-completar">Completar mi perfil</button></div>':''}
     <div class="k" style="margin-top:12px">Hilos descubiertos</div>
     <div class="descubre">${n?`<b>${d}</b> de ${n}. ${d<n?'Toca un hilo o una estrella para descubrir uno.':'¡Los descubriste todos!'}`:'Todavía no hay nadie más en el mapa.'}</div>
     ${comp.filas.length?`<div class="k" style="margin-top:12px">Lo que dijiste de ti</div>
@@ -325,7 +326,20 @@ $('#glosario-lista').innerHTML=T.GLOSARIO.map(g=>`<div><dt>${g.t}</dt><dd>${g.d}
 $('#b-glosario').addEventListener('click',()=>{ $('#glosario').hidden=false; });
 $('#g-volver').addEventListener('click',()=>{ $('#glosario').hidden=true; });
 $('#b-perfil').addEventListener('click',()=>abrirAlta(true));
-document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ ['#glosario','#recorrido','#pin-velo'].forEach(s=>$(s).hidden=true); if(!$('#alta').hidden&&editando) cerrarAlta(); } });
+/* Cerrar una ventana: la ×, un clic en lo oscuro de afuera, o Escape.
+   El alta de la primera vez sólo cierra con la × o Escape, para que
+   un clic fuera no tire lo que ya se contestó. */
+function cerrarVelo(v){
+  if(!v||v.hidden) return;
+  if(v.id==='recorrido') cerrarRecorrido();
+  else if(v.id==='alta') cerrarAlta();
+  else v.hidden=true;
+}
+document.addEventListener('click',e=>{
+  const x=e.target.closest('[data-cerrar]'); if(x){ cerrarVelo(x.closest('.velo')); return; }
+  if(e.target.classList.contains('velo') && !(e.target.id==='alta' && !editando)) cerrarVelo(e.target);
+});
+document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.querySelectorAll('.velo:not([hidden])').forEach(cerrarVelo); });
 
 /* ---------- arranque ---------- */
 async function arrancar(){
