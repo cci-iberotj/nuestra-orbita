@@ -10,7 +10,7 @@
    La base se usa SÓLO a través de funciones (rpc) con el código de
    sesión; la tabla no se lee ni se escribe directo.
    ═══════════════════════════════════════════════════════════ */
-import { crearMapa } from './mapa3d.js';
+import { crearMapa } from './mapa3d.js?v=2.2';
 const M = window.Motor, T = window.Textos;
 const $ = s=>document.querySelector(s);
 const LS = {sesion:'orbita.sesion'};
@@ -329,13 +329,19 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape'){ ['#glosario','#re
 
 /* ---------- arranque ---------- */
 async function arrancar(){
-  if(!M.A){ document.body.insertAdjacentHTML('afterbegin','<p class="fallo">No cargó astronomy-engine (¿sin red?). Sin él no se puede calcular nada.</p>'); return; }
+  if(!M.A){ document.body.insertAdjacentHTML('afterbegin','<p class="fallo">No cargó astronomy-engine (¿sin red?). Sin él no se puede calcular nada.</p>'); quitarCarga(); return; }
   mapa=crearMapa($('#lienzo3d'),{alSeleccionar:(sel,fijo)=>{ seleccion=sel; pintarDetalle(sel,fijo); }});
+  $('#version').textContent='v'+(CONFIG.version||'');
   if(!configurada){ aviso('Falta conectar la base (config.js). Mientras, el mapa enseña la muestra.'); }
   pintarLado();
   document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&conSesion()) cargar(false); });
   setInterval(()=>{ if(mapa&&lista.length){ trHoy=mapa.cielo(); pintarClima(); } },60000);
-  if(sesion){ const ok=await abrirSesion(sesion); if(ok){ setTimeout(()=>mapa.fijar(yo.id),1500); return; } }
-  refrescarMapa();
+  if(sesion){ const ok=await abrirSesion(sesion); if(ok){ setTimeout(()=>mapa.fijar(yo.id),1500); quitarCarga(); return; } }
+  refrescarMapa(); quitarCarga();
 }
+/* El velo de carga se va cuando el mapa ya tiene con qué dibujarse;
+   pase lo que pase, a los 8 s se quita solo. */
+let cargaFuera=false;
+function quitarCarga(){ if(cargaFuera) return; cargaFuera=true; const c=$('#carga'); setTimeout(()=>{ c.classList.add('fuera'); setTimeout(()=>c.remove(),900); },400); }
+setTimeout(quitarCarga,8000);
 arrancar();

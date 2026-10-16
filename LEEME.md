@@ -71,14 +71,14 @@ cosa que borre, salvo que se le agregue `--si-borra`.
 
 ## Publicar cambios
 
-    git add -A
-    git commit -m "qué cambió"
-    python empujar.py
+    python publicar.py "qué cambió"
 
-`empujar.py` sube por la API de GitHub (la red de IBERO bloquea
-github.com pero no api.github.com), igual que en LA PIZARRA. GitHub Pages
-publica solo en cerca de un minuto; los `.js` se quedan en caché del
-navegador hasta diez minutos.
+Sube la versión (abajo a la izquierda de la página se ve, en pequeño),
+la estampa en los archivos para que el navegador de todos pida los
+nuevos al instante, guarda el commit con ese mensaje y empuja con
+`empujar.py` (por la API de GitHub, porque la red de IBERO bloquea
+github.com pero no api.github.com). GitHub Pages publica en cerca de un
+minuto.
 
 ---
 
@@ -96,7 +96,8 @@ navegador hasta diez minutos.
 | `concepto.html` | el estudio de concepto original, con la explicación de todo |
 | `supabase/esquema.sql` | tabla, funciones y permisos |
 | `supabase/correr.py` | correr SQL desde aquí |
-| `empujar.py` | publicar |
+| `publicar.py` | publicar: versión + commit + empujar |
+| `empujar.py` | sólo el empuje por la API (lo llama publicar.py) |
 
 Cálculo en el navegador con [astronomy-engine](https://www.npmjs.com/package/astronomy-engine)
 (MIT); 3D con [three.js](https://threejs.org) (MIT); ciudades con

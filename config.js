@@ -21,4 +21,7 @@ const CONFIG = {
   /* Cada cuántos milisegundos se vuelve a leer la tabla para que
      aparezca quien se acaba de registrar. */
   sondeo: 15000,
+  /* La sube publicar.py en cada publicación; se ve abajo a la
+     izquierda y hace que el navegador pida los archivos nuevos. */
+  version: '2.2',
 };

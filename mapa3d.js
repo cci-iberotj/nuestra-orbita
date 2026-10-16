@@ -134,6 +134,22 @@ export function crearMapa(contenedor, {alSeleccionar}={}){
     }
   }
 
+  /* ---------- precalentar ----------
+     La primera vez que aparece un material, el navegador compila su
+     programa y el cuadro se atora. Se dibuja un cuadro de mentira con
+     uno de cada cosa (estrella, hilo, resplandor) para pagar eso ahora,
+     mientras el velo de carga tapa la pantalla. */
+  {
+    const dummy=new THREE.Group();
+    dummy.add(new THREE.Sprite(new THREE.SpriteMaterial({map:BRILLO,color:0xffffff,transparent:true,depthWrite:false,blending:THREE.AdditiveBlending})));
+    dummy.add(new THREE.Mesh(new THREE.SphereGeometry(.05,8,8), new THREE.MeshBasicMaterial({color:0xffffff})));
+    dummy.add(new THREE.Mesh(new THREE.TorusGeometry(.2,.01,6,24), new THREE.MeshBasicMaterial({color:0xffffff,transparent:true})));
+    const lg=new LineGeometry(); lg.setPositions([0,0,0,1,0,0,2,1,0]);
+    const lm=new LineMaterial({color:0xffffff,linewidth:2,transparent:true,opacity:.5,depthWrite:false,blending:THREE.AdditiveBlending}); lm.resolution.set(2,2);
+    dummy.add(new Line2(lg,lm));
+    escena.add(dummy); renderer.setSize(2,2); compositor.setSize(2,2); compositor.render(); escena.remove(dummy);
+  }
+
   /* ---------- estado ---------- */
   let lista=[], vinculos=[], nodos=[], hilos=[], P=[];
   let conocidos=null, miId=null, descubiertos=new Set();
