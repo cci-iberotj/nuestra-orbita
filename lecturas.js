@@ -137,33 +137,40 @@ function leerPersona(c, tu){
 }
 
 /* ---------- los aspectos entre dos cartas ----------
-   Clave: par de puntos (sin orden) y tipo: C conjunción, A armonía
-   (sextil, trígono), T tensión (cuadratura, oposición). */
+   Clave: par de puntos en orden alfabético y tipo: C conjunción, A
+   armonía (sextil, trígono), T tensión (cuadratura, oposición).
+   {1} es quien tiene el primer punto de la clave y {2} quien tiene el
+   segundo; {a} y {b} son las dos personas cuando da igual el orden.
+   Siempre con nombres: nunca «uno» y «el otro». */
 const PAR = {
-  'Sun|Sun':     {C:'Misma esencia: se entienden de inmediato y también compiten por el mismo espacio.', A:'Esencias compatibles: se apoyan sin esfuerzo.', T:'Esencias que chocan: cada quien quiere llevar las cosas a su manera. Mucha energía si se reparten el terreno.'},
-  'Moon|Sun':    {C:'La esencia de uno coincide con la necesidad emocional del otro: el vínculo clásico de complemento.', A:'Lo que uno es le hace bien a lo que el otro siente: apoyo natural.', T:'Lo que uno es incomoda a lo que el otro necesita: roces que piden ajustar expectativas.'},
-  'Moon|Moon':   {C:'Mismo registro emocional: se leen el ánimo sin hablar.', A:'Ánimos compatibles: se calman mutuamente.', T:'Necesidades emocionales distintas: lo que a uno tranquiliza al otro inquieta.'},
-  'Asc|Sun':     {C:'Uno es como el otro aparenta: afinidad inmediata.', A:'La presencia de uno acompaña la esencia del otro: trato fácil desde el inicio.', T:'Primera impresión y esencia no cuadran: el arranque es incómodo aunque después funcione.'},
-  'Asc|Moon':    {C:'La forma de presentarse de uno encaja con lo que el otro siente: comodidad rápida.', A:'Trato cómodo desde el principio.', T:'La manera de presentarse de uno altera al otro.'},
-  'Asc|Asc':     {C:'Mismo estilo de presentarse.', A:'Estilos de presentarse compatibles.', T:'Estilos de presentarse que contrastan.'},
-  'Mars|Venus':  {C:'Atracción y empuje: uno quiere y el otro actúa, y coinciden. Mucha energía en común.', A:'Afecto y acción coordinados: trabajan y se llevan bien.', T:'Lo que uno quiere y cómo actúa el otro chocan: fricción con chispa.'},
-  'Venus|Venus': {C:'Misma forma de querer y de tratar: gustos parecidos.', A:'Formas de trato compatibles.', T:'Gustos y formas de trato distintos: desacuerdos de estilo.'},
-  'Mars|Mars':   {C:'Misma forma de actuar: aliados o rivales según el terreno.', A:'Ritmos de acción compatibles: avanzan juntos.', T:'Ritmos de acción que chocan: discusiones sobre cómo hacer las cosas.'},
-  'Mercury|Mercury':{C:'Piensan parecido.', A:'Se entienden hablando.', T:'Piensan distinto: discusiones que, bien llevadas, enriquecen.'},
-  'Mercury|Sun': {C:'Uno entiende con facilidad cómo funciona el otro.', A:'Uno entiende con facilidad cómo funciona el otro.', T:'A uno le cuesta entender al otro; hace falta explicar más.'},
-  'Mercury|Moon':{C:'Conversación que calma.', A:'Conversación que calma.', T:'Palabras que irritan sin querer.'},
-  'Sun|Venus':   {C:'Afecto natural: a uno le gusta cómo es el otro.', A:'Afecto natural: a uno le gusta cómo es el otro.', T:'Lo que uno valora y lo que el otro es no coinciden del todo.'},
-  'Moon|Venus':  {C:'Cariño y comodidad: se cuidan.', A:'Cariño y comodidad: se cuidan.', T:'Expectativas de trato distintas.'},
-  'Mars|Sun':    {C:'Energía compartida: empuje y competencia.', A:'Se impulsan.', T:'Choque de voluntades.'},
-  'Mars|Moon':   {C:'Uno activa al otro.', A:'Uno activa al otro.', T:'La forma de actuar de uno hiere lo que el otro siente: discusiones.'},
+  'Sun|Sun':     {C:'{a} y {b} tienen la misma esencia: se entienden de inmediato y compiten por el mismo espacio.', A:'Las esencias de {a} y {b} son compatibles: se apoyan sin esfuerzo.', T:'Las esencias de {a} y {b} chocan: cada quien quiere llevar las cosas a su manera. Mucha energía si se reparten el terreno.'},
+  'Moon|Sun':    {C:'La esencia de {2} coincide con lo que {1} necesita por dentro: el vínculo clásico de complemento.', A:'Lo que {2} es le hace bien a lo que {1} siente: apoyo natural.', T:'Lo que {2} es incomoda a lo que {1} necesita por dentro: roces que piden ajustar expectativas.'},
+  'Moon|Moon':   {C:'{a} y {b} sienten en el mismo registro: se leen el ánimo sin hablar.', A:'Los ánimos de {a} y {b} son compatibles: se calman mutuamente.', T:'Lo que tranquiliza a {a} inquieta a {b}, y al revés: necesidades emocionales distintas.'},
+  'Asc|Sun':     {C:'{2} es como {1} aparenta: afinidad inmediata.', A:'La presencia de {1} acompaña la esencia de {2}: trato fácil desde el inicio.', T:'La primera impresión de {1} no cuadra con la esencia de {2}: el arranque es incómodo aunque después funcione.'},
+  'Asc|Moon':    {C:'La forma de presentarse de {1} encaja con lo que {2} siente: comodidad rápida.', A:'Trato cómodo entre {a} y {b} desde el principio.', T:'La manera de presentarse de {1} altera a {2}.'},
+  'Asc|Asc':     {C:'{a} y {b} se presentan con el mismo estilo.', A:'Los estilos de {a} y {b} se llevan.', T:'Los estilos de {a} y {b} contrastan.'},
+  'Mars|Venus':  {C:'Lo que {2} quiere y cómo actúa {1} coinciden: atracción y empuje, mucha energía en común.', A:'El afecto de {2} y la acción de {1} van coordinados: trabajan y se llevan bien.', T:'Lo que {2} quiere y cómo actúa {1} chocan: fricción con chispa.'},
+  'Venus|Venus': {C:'{a} y {b} quieren y tratan de la misma forma: gustos parecidos.', A:'Las formas de trato de {a} y {b} se llevan.', T:'{a} y {b} tienen gustos y formas de trato distintos: desacuerdos de estilo.'},
+  'Mars|Mars':   {C:'{a} y {b} actúan igual: aliados o rivales según el terreno.', A:'Los ritmos de acción de {a} y {b} se acoplan: avanzan juntos.', T:'Los ritmos de acción de {a} y {b} chocan: discusiones sobre cómo hacer las cosas.'},
+  'Mercury|Mercury':{C:'{a} y {b} piensan parecido.', A:'{a} y {b} se entienden hablando.', T:'{a} y {b} piensan distinto: discusiones que, bien llevadas, enriquecen.'},
+  'Mercury|Sun': {C:'{1} entiende con facilidad cómo funciona {2}.', A:'{1} entiende con facilidad cómo funciona {2}.', T:'A {1} le cuesta entender cómo funciona {2}; hace falta explicar más.'},
+  'Mercury|Moon':{C:'La conversación de {1} calma a {2}.', A:'La conversación de {1} calma a {2}.', T:'Las palabras de {1} irritan a {2} sin querer.'},
+  'Sun|Venus':   {C:'A {2} le gusta cómo es {1}: afecto natural.', A:'A {2} le gusta cómo es {1}: afecto natural.', T:'Lo que {2} valora y lo que {1} es no coinciden del todo.'},
+  'Moon|Venus':  {C:'El cariño de {2} le hace bien a lo que {1} siente: se cuidan.', A:'El cariño de {2} le hace bien a lo que {1} siente: se cuidan.', T:'Lo que {2} espera del trato y lo que {1} siente no coinciden.'},
+  'Mars|Sun':    {C:'La energía de {1} y la esencia de {2} se juntan: empuje y competencia.', A:'La acción de {1} impulsa a {2}.', T:'La forma de actuar de {1} choca con la voluntad de {2}.'},
+  'Mars|Moon':   {C:'La acción de {1} activa a {2}.', A:'La acción de {1} activa a {2}.', T:'La forma de actuar de {1} hiere lo que {2} siente: discusiones.'},
 };
 const NOMBRE = {Sun:'el signo solar',Moon:'el signo lunar',Asc:'el ascendente',Mercury:'Mercurio',Venus:'Venus',Mars:'Marte'};
 function tipo(a){ return a.a===0?'C':(a.a===60||a.a===120)?'A':'T'; }
-function textoAspecto(x){
-  const k=[x.k1,x.k2].sort().join('|'); const t=tipo(x.a);
-  if(PAR[k]) return PAR[k][t];
-  const n1=NOMBRE[x.k1], n2=NOMBRE[x.k2];
-  return t==='A' ? `Compatibilidad entre ${n1} de uno y ${n2} del otro.` : t==='T' ? `Contraste entre ${n1} de uno y ${n2} del otro.` : `Coincidencia entre ${n1} de uno y ${n2} del otro.`;
+/* x.k1 es un punto de la persona a; x.k2, de la persona b. */
+function textoAspecto(x, a, b){
+  const t=tipo(x.a);
+  const orden=[[x.k1,a],[x.k2,b]].sort((p,q)=>p[0]<q[0]?-1:p[0]>q[0]?1:0);
+  const k=orden[0][0]+'|'+orden[1][0]; const n1=orden[0][1], n2=orden[1][1];
+  const llenar = s => s.replace(/\{1\}/g,n1).replace(/\{2\}/g,n2).replace(/\{a\}/g,a).replace(/\{b\}/g,b);
+  if(PAR[k]) return llenar(PAR[k][t]);
+  const p1=NOMBRE[x.k1], p2=NOMBRE[x.k2];
+  return t==='A' ? `${p1} de ${a} y ${p2} de ${b} se llevan.` : t==='T' ? `${p1} de ${a} y ${p2} de ${b} contrastan.` : `${p1} de ${a} y ${p2} de ${b} coinciden.`;
 }
 const INTENSIDAD = {
   'mínima':'Pocos puntos en contacto entre las cartas: relación que tiende a ser tranquila y distante.',
@@ -172,11 +179,11 @@ const INTENSIDAD = {
   'alta':'Muchos contactos: relación que marca a los dos.',
   'excepcional':'Contactos por todos lados: difícil quedar indiferentes.',
 };
-function textoElementos(c1,c2){
+function textoElementos(c1,c2,a,b){
   const r=relacionElementos(elem(c1.Sun),elem(c2.Sun));
-  const s = r==='mismo' ? 'Signos solares del mismo elemento: se entienden el modo de ser.' : r==='afin' ? 'Signos solares de elementos afines: se complementan.' : 'Signos solares de elementos distintos: modos de ser que contrastan.';
+  const s = r==='mismo' ? `${a} y ${b} tienen signos solares del mismo elemento: se entienden el modo de ser.` : r==='afin' ? `Los signos solares de ${a} y ${b} son de elementos afines: se complementan.` : `Los signos solares de ${a} y ${b} son de elementos distintos: modos de ser que contrastan.`;
   const rl=relacionElementos(elem(c1.Moon),elem(c2.Moon));
-  const l = rl==='mismo' ? 'Signos lunares del mismo elemento: sienten parecido.' : rl==='afin' ? 'Signos lunares afines: se acompañan en lo emocional.' : 'Signos lunares de elementos distintos: necesitan cosas distintas para estar bien.';
+  const l = rl==='mismo' ? 'Sus signos lunares son del mismo elemento: sienten parecido.' : rl==='afin' ? 'Sus signos lunares son afines: se acompañan en lo emocional.' : 'Sus signos lunares son de elementos distintos: necesitan cosas distintas para estar bien.';
   return s+' '+l;
 }
 /* La lectura de un hilo: intensidad, los aspectos que más pesan y los elementos. */
@@ -184,8 +191,8 @@ function leerVinculo(v){
   const partes=[];
   partes.push(INTENSIDAD[M.banda(v.I)]);
   const vistos=new Set();
-  v.lista.slice(0,4).forEach(x=>{ const t=textoAspecto(x); if(!vistos.has(t)){ vistos.add(t); partes.push(t); } });
-  partes.push(textoElementos(v.a.carta, v.b.carta));
+  v.lista.slice(0,4).forEach(x=>{ const t=textoAspecto(x, v.a.n, v.b.n); if(!vistos.has(t)){ vistos.add(t); partes.push(t); } });
+  partes.push(textoElementos(v.a.carta, v.b.carta, v.a.n, v.b.n));
   return partes;
 }
 
@@ -203,5 +210,5 @@ function leerDia(x){
   return TRANSITO[p][t];
 }
 
-return {SOL, LUNA, ASC, MERCURIO, VENUS, MARTE, ELEMENTO, MODALIDAD, sintesisPersona, leerPersona, leerVinculo, leerDia, textoAspecto, INTENSIDAD};
+return {SOL, LUNA, ASC, MERCURIO, VENUS, MARTE, ELEMENTO, MODALIDAD, sintesisPersona, leerPersona, leerVinculo, leerDia, consecuenciaDia:(p,t)=>TRANSITO[p][t], textoAspecto, INTENSIDAD};
 })();

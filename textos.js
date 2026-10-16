@@ -134,6 +134,36 @@ function descripcionEstrella(c, tu){
   return t;
 }
 
+/* ---------- el cielo de hoy sobre una persona ----------
+   «Luna en Capricornio en sextil (armonía) a tu signo lunar: ánimo ligero.»
+   quien = 'ti' para la persona que mira; si no, su nombre. */
+const ASPECTO_CORTO = {60:'en sextil (armonía) a', 120:'en trígono (armonía) a', 90:'en cuadratura (tensión) a', 180:'en oposición (tensión) a', 0:'sobre'};
+function diaPersona(C, quien, tr){
+  const L=window.Lecturas; const out=[];
+  [['Moon',6],['Venus',4],['Mars',4],['Sun',4]].forEach(([t,o])=>{
+    for(const k of ['Sun','Moon','Asc']){ if(C[k]==null) continue; const a=M.aspecto(tr[t],C[k],o); if(!a) continue;
+      const tipo = a.a===0?'C':M.VAL[a.a]>0?'A':'T';
+      const punto = quien==='ti' ? PUNTO[k].corto : de(k,quien);
+      out.push({v:Math.abs(M.VAL[a.a])*(1-a.orb/o), tipo, txt:`${M.PLAN[t]} en ${M.SIGNOS[M.signo(tr[t])]} ${ASPECTO_CORTO[a.a]} ${punto}`.replace(' a el ',' al ')+`: ${L?L.consecuenciaDia(t,tipo):''}`});
+    }
+  });
+  out.sort((a,b)=>b.v-a.v);
+  return out.slice(0,2);
+}
+/* La lectura de hoy para dos personas: a cada quien lo suyo y luego
+   qué significa entre las dos. */
+function diaPareja(p1, p2, tr, tuyo){
+  const l1=diaPersona(p1.carta, tuyo?'ti':p1.n, tr), l2=diaPersona(p2.carta, p2.n, tr);
+  const linea=(quien,l)=>`<b>${quien}:</b> ${l.length?l.map(x=>x.txt).join('. ')+'.':'sin aspectos del cielo hoy.'}`;
+  const peso=l=>l.reduce((s,x)=>s+(x.tipo==='T'?-x.v:x.tipo==='A'?x.v:0),0);
+  const w1=peso(l1), w2=peso(l2); let entre;
+  if(!l1.length&&!l2.length) entre='nada marcado; día parejo.';
+  else if(w1>=0&&w2>=0) entre='día fácil para las dos partes.';
+  else if(w1<0&&w2<0) entre='día de roces para las dos partes; conviene no forzar.';
+  else entre = (w1<w2 && tuyo) ? 'día desigual: hoy el cielo te pesa más a ti.' : `día desigual: hoy el cielo le pesa más a ${w1<w2?p1.n:p2.n}.`;
+  return `${linea(tuyo?'A ti':'A '+p1.n, l1)}<br>${linea('A '+p2.n, l2)}<br><b>Entre ustedes:</b> ${entre}`;
+}
+
 /* ---------- glosario ---------- */
 const GLOSARIO = [
   {t:'Signo solar', d:'El signo de siempre: dónde estaba el Sol el día que naciste. Representa la esencia. En el mapa marca la posición de la estrella en el anillo.'},
@@ -153,5 +183,5 @@ const RECORRIDO = [
   {t:'Glosario', d:'Siete términos explican todo el mapa: signo solar, signo lunar, ascendente, aspectos, hilos, elementos y cielo de hoy. Está arriba, en Glosario. Es un juego del equipo, no una evaluación.'},
 ];
 
-return {PUNTO, de, ELEMENTO, ELEMENTO_FRASE, ASPECTO_LLANO, tonoLlano, intensidadLlana, porque, pron, PALABRAS, palabra, elementosDe, comparar, climaLlano, fraseDia, descripcionEstrella, GLOSARIO, RECORRIDO};
+return {PUNTO, de, ELEMENTO, ELEMENTO_FRASE, ASPECTO_LLANO, tonoLlano, intensidadLlana, porque, pron, PALABRAS, palabra, elementosDe, comparar, climaLlano, fraseDia, diaPersona, diaPareja, descripcionEstrella, GLOSARIO, RECORRIDO};
 })();
