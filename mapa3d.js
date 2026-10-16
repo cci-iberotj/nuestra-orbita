@@ -74,7 +74,7 @@ function posiciones(lista){
   return out;
 }
 
-export function crearMapa(contenedor, {alSeleccionar}={}){
+export function crearMapa(contenedor, {alSeleccionar, alIntro, alIntroFin, semillaPx=120}={}){
   /* ---------- escena ---------- */
   const escena=new THREE.Scene();
   escena.background=new THREE.Color(0x0b1026);
@@ -99,7 +99,7 @@ export function crearMapa(contenedor, {alSeleccionar}={}){
   controles.enableDamping=true; controles.dampingFactor=.06; controles.enablePan=false;
   controles.minPolarAngle=.55; controles.maxPolarAngle=1.5;
   controles.autoRotate=true; controles.autoRotateSpeed=.35;
-  controles.target.set(0,.4,0);
+  controles.target.set(0,0,0);
 
   /* ---------- fondo: estrellas y nebulosas ---------- */
   const fondo=new THREE.Group(); escena.add(fondo); fondo.visible=false;
@@ -115,18 +115,7 @@ export function crearMapa(contenedor, {alSeleccionar}={}){
     });
   }
 
-  /* ---------- la semilla: la estrella que se ve mientras carga ----------
-     Es la misma del velo de carga: cuando el mapa está listo, de ella
-     se despliega el anillo y la cámara se aleja. */
-  const semilla=new THREE.Group(); semilla.position.set(0,.4,0); escena.add(semilla);
-  const semBrillo=new THREE.Sprite(new THREE.SpriteMaterial({map:BRILLO,color:0xffd79a,transparent:true,opacity:.9,depthWrite:false,blending:THREE.AdditiveBlending}));
-  semBrillo.scale.set(1.6,1.6,1); semilla.add(semBrillo);
-  const semNucleo=new THREE.Mesh(new THREE.SphereGeometry(.11,16,16), new THREE.MeshBasicMaterial({color:0xffffff})); semilla.add(semNucleo);
-  const semOrbita=new THREE.Mesh(new THREE.TorusGeometry(.9,.012,8,64).rotateX(Math.PI/2), new THREE.MeshBasicMaterial({color:COLOR.anillo,transparent:true,opacity:.5})); semilla.add(semOrbita);
-  const semPunto=new THREE.Sprite(new THREE.SpriteMaterial({map:BRILLO,color:0xffd79a,transparent:true,opacity:.9,depthWrite:false,blending:THREE.AdditiveBlending})); semPunto.scale.set(.35,.35,1); semilla.add(semPunto);
-  const semTxt=document.createElement('div'); semTxt.className='etq carga-txt3d'; semTxt.textContent='Encendiendo el cielo…';
-  const semEtq=new CSS2DObject(semTxt); semEtq.position.set(0,-1.3,0); semilla.add(semEtq);
-  let introHecha=false, introT=null;
+  let introHecha=false;
 
   /* ---------- anillo de signos ---------- */
   const anillo=new THREE.Group(); escena.add(anillo); anillo.visible=false;
@@ -169,7 +158,7 @@ export function crearMapa(contenedor, {alSeleccionar}={}){
   let seleccion=null, sobre=null, firma='';
   let transitos={grupo:new THREE.Group(), marcas:{}}; escena.add(transitos.grupo); transitos.grupo.visible=false;
   const reloj=new THREE.Clock(); let animaciones=[];
-  const objetivo=new THREE.Vector3(0,.4,0);
+  const objetivo=new THREE.Vector3(0,0,0);
 
   function calcularVinculos(){
     vinculos=[];
@@ -210,7 +199,7 @@ export function crearMapa(contenedor, {alSeleccionar}={}){
       escena.add(g);
       const nodo={p,grupo:g,brillo,nucleo,centro,aro,etiqueta:et,base,pulso:0};
       nodos.push(nodo);
-      if(nuevos.has(p.id)) nacer(nodo, primera? 1.3+i*.12 : 0);
+      if(nuevos.has(p.id)) nacer(nodo, primera? 1.9+i*.12 : 0);
     });
 
     vinculos.forEach((v,k)=>{
@@ -226,7 +215,7 @@ export function crearMapa(contenedor, {alSeleccionar}={}){
       escena.add(linea);
       const hilo={v,k,linea,mat,I,opacidad:.16+.5*I,ancho:1+3.4*I,segmentos:puntos.length-1};
       hilos.push(hilo);
-      if(nuevos.has(v.a.id)||nuevos.has(v.b.id)){ geo.instanceCount=0; animaciones.push({t:0,dur:1.3,retraso:primera?2.5+Math.max(v.i,v.j)*.12:.7,paso:f=>{ geo.instanceCount=Math.round(f*hilo.segmentos); }}); }
+      if(nuevos.has(v.a.id)||nuevos.has(v.b.id)){ geo.instanceCount=0; animaciones.push({t:0,dur:1.3,retraso:primera?3.0+Math.max(v.i,v.j)*.12:.7,paso:f=>{ geo.instanceCount=Math.round(f*hilo.segmentos); }}); }
     });
     conocidos=new Set(lista.map(p=>p.id));
     aplicarEstado();
@@ -244,25 +233,38 @@ export function crearMapa(contenedor, {alSeleccionar}={}){
     },fin:()=>{ nodo.grupo.remove(onda); onda.geometry.dispose(); onda.material.dispose(); nodo.brillo.scale.set(b,b,1); }});
   }
 
-  /* La intro: del punto al mapa. El anillo crece desde la semilla, el
-     fondo se enciende, la cámara se aleja y la semilla se apaga. */
+  /* La intro: de la semilla al mapa. La semilla (estrella + órbita) es
+     HTML y vive sobre la escena, en el centro exacto del anillo. Aquí el
+     anillo arranca con el mismo tamaño en pantalla que esa órbita y
+     crece mientras la cámara se aleja; cada cuadro se avisa a la página
+     (alIntro) con el factor de escala que debe tener la órbita HTML
+     para ir pegada al anillo, y con cuánto va la fundición. */
+  function anchoAnilloPx(){
+    const d=camara.position.distanceTo(controles.target);
+    const h=renderer.getSize(new THREE.Vector2()).y;
+    return 2*R_ANILLO * h/(2*d*Math.tan(camara.fov/2*RAD));
+  }
   function intro(){
     if(introHecha) return; introHecha=true;
-    anillo.visible=true; fondo.visible=true; anillo.scale.setScalar(.04);
+    const d0=camara.position.clone().sub(controles.target); const base=d0.length();
+    const finalPx=anchoAnilloPx();                       // ancho del anillo a la distancia final
+    const s0=Math.min(.6, 0.55*semillaPx/finalPx);       // escala inicial: mismo ancho en pantalla que la órbita HTML
+    anillo.visible=true; fondo.visible=true; anillo.scale.setScalar(s0);
     const matsFondo=[]; fondo.traverse(o=>{ if(o.material){ matsFondo.push([o.material,o.material.opacity]); o.material.opacity=0; } });
     const matsAnillo=[]; anillo.traverse(o=>{ if(o.material){ matsAnillo.push([o.material,o.material.opacity]); o.material.transparent=true; o.material.opacity=0; } });
     anillo.traverse(o=>{ if(o.isCSS2DObject) o.element.style.opacity=0; });
-    const d0=camara.position.clone().sub(controles.target); const base=d0.length();
-    animaciones.push({fija:true,t:0,dur:1.7,retraso:.1,paso:f=>{
+    camara.position.copy(controles.target).add(d0.clone().normalize().multiplyScalar(base*0.55));
+    animaciones.push({fija:true,t:0,dur:2.4,retraso:.05,paso:f=>{
       const e=1-Math.pow(1-f,3);
-      anillo.scale.setScalar(.04+.96*e);
-      matsAnillo.forEach(([m,o])=>m.opacity=o*Math.min(1,f*1.4));
-      anillo.traverse(o=>{ if(o.isCSS2DObject) o.element.style.opacity=Math.max(0,(f-.5)*2); });
+      const escala=s0+(1-s0)*e, dist=0.55+0.45*e;
+      anillo.scale.setScalar(escala);
+      camara.position.copy(controles.target).add(d0.clone().normalize().multiplyScalar(base*dist));
+      const fundido=Math.max(0,Math.min(1,(f-.15)/.4));    // el anillo 3D entra pronto, debajo de la órbita HTML
+      matsAnillo.forEach(([m,o])=>m.opacity=o*fundido);
+      anillo.traverse(o=>{ if(o.isCSS2DObject) o.element.style.opacity=Math.max(0,(f-.55)/.4); });
       matsFondo.forEach(([m,o])=>m.opacity=o*e);
-      const s=1.6*(1-e)+.001; semBrillo.scale.set(s,s,1); semNucleo.scale.setScalar(1-e+.001); semOrbita.scale.setScalar(1+e*5.8); semOrbita.material.opacity=.5*(1-f); semPunto.material.opacity=.9*(1-f);
-      semTxt.style.opacity=Math.max(0,1-f*3);
-      camara.position.copy(controles.target).add(d0.clone().normalize().multiplyScalar(base*(0.55+0.45*e)));
-    },fin:()=>{ escena.remove(semilla); semTxt.remove(); transitos.grupo.visible=true; }});
+      if(alIntro) alIntro({f, e, escalaHTML: (escala/dist)*finalPx/semillaPx, fundido});
+    },fin:()=>{ transitos.grupo.visible=true; if(alIntroFin) alIntroFin(); }});
   }
 
   /* Qué se ve atenuado y qué encendido según la selección. */
@@ -285,10 +287,10 @@ export function crearMapa(contenedor, {alSeleccionar}={}){
       h.mat.linewidth = on ? h.ancho*(descubierto?1:.6) : h.ancho*.5;
       h.linea.userData.descubierto=descubierto;
     });
-    controles.autoRotate=!seleccion;
+    controles.autoRotate=!seleccion && introHecha;
     if(seleccion&&seleccion.tipo==='nodo') objetivo.copy(P[seleccion.i]).multiplyScalar(.45).setY(P[seleccion.i].y*.5);
     else if(seleccion&&seleccion.tipo==='hilo'){ const v=vinculos[seleccion.k]; objetivo.copy(P[v.i]).add(P[v.j]).multiplyScalar(.5).multiplyScalar(.45); }
-    else objetivo.set(0,.4,0);
+    else objetivo.set(0,0,0);
   }
 
   /* ---------- tránsitos ---------- */
@@ -362,7 +364,6 @@ export function crearMapa(contenedor, {alSeleccionar}={}){
     if(!vivo) return; requestAnimationFrame(cuadro);
     const dt=Math.min(reloj.getDelta(),.05), t=reloj.elapsedTime;
     fondo.rotation.y+=dt*.004;
-    if(!introHecha){ const s=1.6*(1+.14*Math.sin(t*2.6)); semBrillo.scale.set(s,s,1); semPunto.position.set(Math.cos(t*1.8)*.9,0,-Math.sin(t*1.8)*.9); }
     nodos.forEach((n,i)=>{
       const f=i*1.7; n.grupo.position.set(P[i].x+.06*Math.sin(t*.45+f), P[i].y+.05*Math.cos(t*.38+f*1.3), P[i].z+.06*Math.sin(t*.4+f*.7));
       if(n.pulso){ const s=n.base*(1+.22*Math.sin(t*2.4+f)); n.brillo.scale.set(s,s,1); }

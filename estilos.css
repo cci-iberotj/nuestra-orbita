@@ -173,17 +173,24 @@ details.lectura summary::-webkit-details-marker{display:none}
 #glosario-lista dt{font-family:"Cormorant Garamond",serif;font-size:21px}
 #glosario-lista dd{margin:2px 0 0;color:var(--ink2);font-size:14px}
 
-/* ============== carga ============== */
-.carga{position:fixed;inset:0;z-index:100;display:grid;place-items:center;align-content:center;gap:18px;background:radial-gradient(900px 500px at 30% 20%,var(--sky3),transparent 60%),linear-gradient(170deg,var(--sky1),var(--sky2));transition:opacity .8s ease}
-.carga.fuera{opacity:0;pointer-events:none}
-.carga-cielo{position:relative;width:120px;height:120px}
-@media (min-width:901px){.carga{place-items:center;padding-left:390px}}
+/* ============== carga ==============
+   Dentro de la escena. El centro (.carga-cielo) coincide con el centro
+   del anillo 3D: en escritorio el anillo se centra en el espacio libre a
+   la derecha de la columna de 390 px, así que va a 50 % + 195 px. */
+.carga{position:absolute;inset:0;z-index:5;pointer-events:none;transition:opacity .5s ease}
+.carga.fuera{opacity:0}
+.carga-cielo{position:absolute;left:50%;top:50%;width:120px;height:120px;margin:-60px 0 0 -60px;transform-style:preserve-3d}
+.carga-txt{position:absolute;left:50%;top:calc(50% + 72px);transform:translateX(-50%);white-space:nowrap}
+@media (min-width:901px){.carga-cielo,.carga-txt{left:calc(50% + 195px)}}
 .carga-cielo .estrella{position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:#fff;box-shadow:0 0 18px 6px rgba(255,215,154,.55),0 0 60px 20px rgba(212,166,255,.25);animation:latir 2.2s ease-in-out infinite}
-.carga-cielo .orbita{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(200,190,240,.25);transform:rotateX(62deg);animation:girar 3.2s linear infinite}
-.carga-cielo .orbita::after{content:"";position:absolute;left:50%;top:-3px;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:var(--oro);box-shadow:0 0 10px 3px rgba(255,215,154,.6)}
-@keyframes girar{to{transform:rotateX(62deg) rotateZ(360deg)}}
+.carga-cielo .anillo{position:absolute;inset:0;border-radius:50%;border:1.5px solid rgba(215,205,255,.75);box-shadow:0 0 14px rgba(200,190,240,.35),inset 0 0 14px rgba(200,190,240,.18);transform:rotateX(62deg);transform-origin:50% 50%}
+.carga-cielo .giro{position:absolute;inset:0;animation:girar 3.2s linear infinite}
+.carga-cielo .punto{position:absolute;left:50%;top:-3px;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:var(--oro);box-shadow:0 0 10px 3px rgba(255,215,154,.6)}
+@keyframes girar{to{transform:rotateZ(360deg)}}
 @keyframes latir{0%,100%{transform:scale(1)}50%{transform:scale(1.35)}}
-.carga-txt,.etq.carga-txt3d{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:20px;color:var(--ink2);letter-spacing:.02em;text-shadow:none}
+.carga-txt{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:20px;color:var(--ink2);letter-spacing:.02em}
+#nav{transition:opacity .9s ease}
+body:not(.listo) #nav{opacity:0}
 .version{position:fixed;right:14px;bottom:4px;font-size:10px;color:rgba(255,255,255,.35);letter-spacing:.08em;z-index:3;pointer-events:none}
 
 /* ============== velos ============== */

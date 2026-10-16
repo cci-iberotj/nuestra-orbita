@@ -10,7 +10,7 @@
    La base se usa SÓLO a través de funciones (rpc) con el código de
    sesión; la tabla no se lee ni se escribe directo.
    ═══════════════════════════════════════════════════════════ */
-import { crearMapa } from './mapa3d.js?v=2.8';
+import { crearMapa } from './mapa3d.js?v=2.9';
 const M = window.Motor, T = window.Textos, L = window.Lecturas;
 const $ = s=>document.querySelector(s);
 const LS = {sesion:'orbita.sesion'};
@@ -78,7 +78,7 @@ function refrescarMapa(){
   $('#aviso-demo').hidden=!demo;
   $('#aviso-solo').hidden=!(conSesion()&&filas&&filas.length===1);
   mapa.poner(lista,{miId:conSesion()?yo.id:null, descubiertos:conSesion()?yo.descubiertos:[]});
-  if(!document.body.classList.contains('listo')) setTimeout(()=>document.body.classList.add('listo'), 1100);
+  if(!document.body.classList.contains('listo')) setTimeout(()=>document.body.classList.add('listo'), 2300);
   trHoy=mapa.cielo();
   pintarClima(); pintarMia(); pintarDetalle(seleccion);
 }
@@ -357,18 +357,27 @@ document.addEventListener('keydown',e=>{ if(e.key==='Escape') document.querySele
 /* ---------- arranque ---------- */
 async function arrancar(){
   if(!M.A){ document.body.insertAdjacentHTML('afterbegin','<p class="fallo">No cargó astronomy-engine (¿sin red?). Sin él no se puede calcular nada.</p>'); quitarCarga(); return; }
-  mapa=crearMapa($('#lienzo3d'),{alSeleccionar:(sel,fijo)=>{ seleccion=sel; pintarDetalle(sel,fijo); }});
+  mapa=crearMapa($('#lienzo3d'),{
+    alSeleccionar:(sel,fijo)=>{ seleccion=sel; pintarDetalle(sel,fijo); },
+    alIntro:({f,escalaHTML,fundido})=>{   // la órbita HTML va pegada al anillo 3D y se funde con él
+      const an=$('#carga-anillo'), es=$('#carga-estrella'), tx=$('#carga-txt'); if(!an) return;
+      an.style.transform=`rotateX(62deg) scale(${escalaHTML.toFixed(4)})`; an.style.opacity=1-Math.max(0,Math.min(1,(f-.4)/.3));   // la órbita HTML se va cuando el anillo 3D ya está
+      const q=1-Math.max(0,Math.min(1,(f-.1)/.6)); es.style.transform=`scale(${q})`; es.style.opacity=q; es.style.animation='none';
+      tx.style.opacity=Math.max(0,1-f/.3);
+    },
+    alIntroFin:()=>quitarCarga(),
+  });
   $('#version').textContent='v'+(CONFIG.version||'');
   if(!configurada){ aviso('Falta conectar la base (config.js). Mientras, el mapa enseña la muestra.'); }
   pintarLado();
   document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&conSesion()) cargar(false); });
   setInterval(()=>{ if(mapa&&lista.length){ trHoy=mapa.cielo(); pintarClima(); } },60000);
-  if(sesion){ const ok=await abrirSesion(sesion); if(ok){ setTimeout(()=>mapa.fijar(yo.id),2600); quitarCarga(); return; } }
-  refrescarMapa(); quitarCarga(); puerta(leer('orbita.conocido')?'entrar':'alta');
+  if(sesion){ const ok=await abrirSesion(sesion); if(ok){ setTimeout(()=>mapa.fijar(yo.id),3800); return; } }
+  refrescarMapa(); puerta(leer('orbita.conocido')?'entrar':'alta');
 }
 /* El velo de carga se va cuando el mapa ya tiene con qué dibujarse;
    pase lo que pase, a los 8 s se quita solo. */
 let cargaFuera=false;
-function quitarCarga(){ if(cargaFuera) return; cargaFuera=true; const c=$('#carga'); setTimeout(()=>{ c.classList.add('fuera'); setTimeout(()=>c.remove(),900); },400); }
-setTimeout(quitarCarga,8000);
+function quitarCarga(){ if(cargaFuera) return; cargaFuera=true; const c=$('#carga'); if(!c) return; c.classList.add('fuera'); setTimeout(()=>c.remove(),600); }
+setTimeout(quitarCarga,12000);
 arrancar();
