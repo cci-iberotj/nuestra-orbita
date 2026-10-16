@@ -1,0 +1,745 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Constelación · Mapa de afinidades del equipo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
+<style>
+:root{
+  --bg:#f5f2fb; --bg2:#fbf7f2; --card:#ffffff; --line:#e6e0f3; --ink:#2b2544; --ink2:#5c5478; --ink3:#8b83a6;
+  --acc:#6b4fd8; --acc2:#c99a3b; --accsoft:#efe9ff; --goldsoft:#fbf1dc;
+  --r:18px; --shadow:0 10px 30px -18px rgba(60,40,120,.35);
+  /* mapa · noche */
+  --sky1:#0b1026; --sky2:#1b1744; --sky3:#2a1d5a; --ring:rgba(255,255,255,.14); --ringtxt:rgba(255,255,255,.55);
+  --star:#ffffff; --label:rgba(255,255,255,.82); --panel:rgba(14,16,40,.72); --paneltxt:#ece8ff; --panelline:rgba(255,255,255,.14);
+  --fuego:#ffb36b; --tierra:#a8e6a1; --aire:#a9d8ff; --agua:#c9b0ff;
+  --oro:#ffd79a; --violeta:#d4a6ff; --azul:#9fd3ff;
+}
+.mapa[data-tema="alba"]{
+  --sky1:#f3ecff; --sky2:#fde8dc; --sky3:#e9e0ff; --ring:rgba(80,60,140,.18); --ringtxt:rgba(80,60,140,.6);
+  --star:#6b4fd8; --label:#3a3160; --panel:rgba(255,255,255,.78); --paneltxt:#2b2544; --panelline:rgba(80,60,140,.15);
+  --fuego:#e2742b; --tierra:#3f9a4a; --aire:#3b82c4; --agua:#7a52d6;
+  --oro:#c99a3b; --violeta:#9b5de5; --azul:#4f8fd6;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Manrope,system-ui,sans-serif;font-weight:400;line-height:1.55;-webkit-font-smoothing:antialiased}
+body{background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%)}
+a{color:var(--acc)}
+h1,h2,h3,.serif{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;letter-spacing:.005em;margin:0}
+h1{font-size:clamp(44px,7vw,84px);line-height:.98}
+h2{font-size:clamp(30px,4vw,44px);line-height:1.1}
+h3{font-size:24px}
+p{margin:.4em 0 1em}
+.wrap{width:min(1120px,100% - 32px);margin:0 auto}
+.eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink3);font-weight:600}
+.lead{font-size:19px;color:var(--ink2);max-width:60ch}
+section{padding:72px 0}
+header.hero{padding:84px 0 36px}
+header.hero .wrap{display:grid;gap:22px}
+.hero-meta{display:flex;gap:18px;flex-wrap:wrap;font-size:14px;color:var(--ink3)}
+.hero-meta b{color:var(--ink2);font-weight:600}
+.pill{display:inline-block;padding:4px 12px;border-radius:999px;background:var(--accsoft);color:var(--acc);font-size:12px;font-weight:600;letter-spacing:.04em}
+.pill.oro{background:var(--goldsoft);color:#8a6418}
+.grid{display:grid;gap:18px}
+.g2{grid-template-columns:repeat(auto-fit,minmax(280px,1fr))}
+.g3{grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.card{background:var(--card);border:1px solid var(--line);border-radius:var(--r);padding:24px;box-shadow:var(--shadow)}
+.card h3{margin-bottom:8px}
+.card p:last-child{margin-bottom:0}
+.muted{color:var(--ink3)}
+.small{font-size:14px}
+table{width:100%;border-collapse:collapse;font-size:15px;background:var(--card);border-radius:var(--r);overflow:hidden;border:1px solid var(--line)}
+th,td{padding:12px 14px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+th{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);font-weight:600;background:#faf8fe}
+tr:last-child td{border-bottom:0}
+td b{font-weight:600}
+.tag{display:inline-block;padding:2px 9px;border-radius:999px;font-size:12px;font-weight:600}
+.tag.si{background:#e8f6ea;color:#2e7d3b}.tag.op{background:var(--goldsoft);color:#8a6418}.tag.no{background:#f3f1f8;color:var(--ink3)}
+ol.pasos{counter-reset:p;list-style:none;padding:0;margin:0;display:grid;gap:12px}
+ol.pasos li{counter-increment:p;display:grid;grid-template-columns:44px 1fr;gap:14px;align-items:start}
+ol.pasos li::before{content:counter(p);font-family:"Cormorant Garamond",serif;font-size:30px;line-height:1;color:var(--acc);font-weight:500}
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.flow .step{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px;font-size:14px;position:relative}
+.flow .step b{display:block;font-weight:600;margin-bottom:4px}
+.flow .step .n{font-family:"Cormorant Garamond",serif;font-size:26px;color:var(--acc2);line-height:1}
+.fuentes{font-size:14px;color:var(--ink2)}
+.fuentes li{margin-bottom:6px}
+footer{padding:40px 0 80px;color:var(--ink3);font-size:13px}
+.nota{border-left:3px solid var(--acc2);padding:8px 16px;background:var(--goldsoft);border-radius:0 12px 12px 0;font-size:15px}
+
+/* ============== MAPA ============== */
+.mapa{position:relative;border-radius:28px;overflow:hidden;background:radial-gradient(1200px 700px at 20% 10%,var(--sky3),transparent 60%),radial-gradient(900px 600px at 85% 90%,var(--sky3),transparent 60%),linear-gradient(160deg,var(--sky1),var(--sky2));box-shadow:0 40px 80px -40px rgba(30,20,80,.6);color:var(--paneltxt);transition:background .6s}
+.mapa canvas.estrellas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.mapa .nebula{position:absolute;inset:0;pointer-events:none;background:
+  radial-gradient(600px 400px at 70% 30%,rgba(212,166,255,.16),transparent 70%),
+  radial-gradient(500px 500px at 30% 75%,rgba(255,215,154,.10),transparent 70%),
+  radial-gradient(400px 300px at 55% 60%,rgba(159,211,255,.10),transparent 70%);filter:blur(10px)}
+.mapa-grid{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:0;min-height:720px}
+@media (max-width:900px){.mapa-grid{grid-template-columns:1fr}}
+.cielo{position:relative;padding:18px}
+.cielo svg{width:100%;height:auto;display:block;overflow:visible}
+.lado{padding:22px 22px 22px 0;display:flex;flex-direction:column;gap:14px}
+@media (max-width:900px){.lado{padding:0 18px 18px}}
+.panel{background:var(--panel);backdrop-filter:blur(14px);border:1px solid var(--panelline);border-radius:18px;padding:16px 18px;font-size:14px}
+.panel h4{margin:0 0 8px;font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:500}
+.panel .k{opacity:.6;font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+.panel .ficha{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:8px 0}
+.panel .ficha span:nth-child(odd){opacity:.65}
+.panel .lista{margin:8px 0 0;padding:0;list-style:none;display:grid;gap:6px}
+.panel .lista li{display:flex;gap:8px;align-items:baseline}
+.panel .lista .asp{font-size:17px;width:20px;text-align:center}
+.panel .lista .orb{opacity:.5;font-size:12px;margin-left:auto;white-space:nowrap}
+.medidor{height:6px;border-radius:999px;background:rgba(127,127,160,.25);overflow:hidden;margin:6px 0 2px}
+.medidor i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--azul),var(--oro))}
+.tono{display:inline-flex;align-items:center;gap:8px;font-weight:600}
+.tono i{width:10px;height:10px;border-radius:50%;display:inline-block;box-shadow:0 0 12px currentColor}
+.leyenda{display:grid;gap:6px;font-size:13px}
+.leyenda div{display:flex;align-items:center;gap:10px}
+.leyenda .hilo{width:34px;height:3px;border-radius:2px;box-shadow:0 0 8px currentColor}
+.leyenda .punto{width:10px;height:10px;border-radius:50%;box-shadow:0 0 10px currentColor}
+.clima{display:flex;flex-wrap:wrap;gap:10px 18px;font-size:14px}
+.clima b{font-weight:600}
+.clima .gl{font-size:17px;margin-right:4px}
+.ctrls{display:grid;gap:10px}
+.ctrl{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;font-size:13px}
+.ctrl input[type=range]{width:120px;accent-color:var(--acc)}
+.seg{display:inline-flex;border:1px solid var(--panelline);border-radius:999px;overflow:hidden}
+.seg button{background:transparent;border:0;color:inherit;padding:5px 12px;font:inherit;font-size:12px;cursor:pointer;opacity:.7}
+.seg button.on{background:rgba(127,127,200,.25);opacity:1}
+.sw{position:relative;width:36px;height:20px;border-radius:999px;background:rgba(127,127,160,.35);border:0;cursor:pointer;transition:.2s}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.2s}
+.sw.on{background:var(--acc)}.sw.on::after{left:18px}
+.mapa input[type=date],.mapa input[type=time],.mapa input[type=text],.mapa input[type=search]{background:rgba(127,127,170,.15);border:1px solid var(--panelline);color:inherit;border-radius:10px;padding:7px 10px;font:inherit;font-size:13px;width:100%}
+.mapa input[type=date]{color-scheme:dark}
+.mapa[data-tema="alba"] input[type=date]{color-scheme:light}
+.boton{background:var(--acc);color:#fff;border:0;border-radius:999px;padding:9px 16px;font:inherit;font-weight:600;font-size:13px;cursor:pointer}
+.boton.sec{background:transparent;border:1px solid var(--panelline);color:inherit}
+.vacio{opacity:.55;font-style:italic}
+/* svg */
+.nodo{cursor:pointer}
+.nodo text{font-family:Manrope,sans-serif;font-size:13px;fill:var(--label);font-weight:500;text-anchor:middle;pointer-events:none}
+.nodo .halo{opacity:.35}
+.nodo.pin .anillo,.nodo:hover .anillo{opacity:1}
+.nodo .anillo{opacity:0;fill:none;stroke:var(--star);stroke-width:1;transition:opacity .3s}
+.nodo .luna-toca{fill:none;stroke:var(--oro);stroke-width:1.2;opacity:.9;animation:pulso 2.6s ease-in-out infinite}
+@keyframes pulso{0%,100%{r:14;opacity:.9}50%{r:20;opacity:.2}}
+.hilo{fill:none;stroke-linecap:round;cursor:pointer;transition:opacity .35s}
+.hilo.ancho{stroke:transparent;stroke-width:14}
+.mapa.foco .hilo:not(.on){opacity:.08!important}
+.mapa.foco .nodo:not(.on){opacity:.35}
+.ring text{font-size:15px;fill:var(--ringtxt);text-anchor:middle;dominant-baseline:middle}
+.ring line,.ring circle{stroke:var(--ring);fill:none}
+.transito text{font-size:11px;fill:var(--label);text-anchor:middle;letter-spacing:.06em;text-transform:uppercase;opacity:.8}
+.tu text{font-style:italic}
+/* lista de ciudades */
+.sug{display:grid;gap:4px;margin-top:6px}
+.sug button{text-align:left;background:rgba(127,127,170,.12);border:1px solid var(--panelline);border-radius:8px;color:inherit;padding:6px 10px;font:inherit;font-size:12px;cursor:pointer}
+.sug button:hover{background:rgba(127,127,200,.25)}
+.probar{display:grid;gap:8px}
+.probar .fila{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Estudio de concepto · 16 de octubre de 2026 · Equipo de Diseño y Medios</div>
+    <h1>Constelación<br><span class="serif" style="font-style:italic;font-weight:400;color:var(--ink2)">el mapa de afinidades del equipo</span></h1>
+    <p class="lead">Una web donde cada quien registra su fecha, hora y lugar de nacimiento, y el equipo entero aparece como una constelación: cada persona es una estrella y los hilos que las unen cambian con el cielo de cada día.</p>
+    <div class="hero-meta">
+      <span><b>Nombre técnico de lo que quieres hacer:</b> sinastría de grupo con tránsitos en tiempo real</span>
+      <span><b>Estado:</b> concepto + mockup funcional (los datos de abajo son ficticios)</span>
+    </div>
+  </div>
+</header>
+
+<!-- ============================== MOCKUP ============================== -->
+<section id="mockup" style="padding-top:12px">
+  <div class="wrap">
+    <div class="mapa" id="mapa" data-tema="noche">
+      <canvas class="estrellas" id="fondo"></canvas>
+      <div class="nebula"></div>
+      <div class="mapa-grid">
+        <div class="cielo">
+          <svg id="svg" viewBox="0 0 800 800" aria-label="Mapa de afinidades">
+            <defs>
+              <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+              <filter id="glow2" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="9"/></filter>
+              <filter id="hiloglow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            </defs>
+            <g class="ring" id="ring"></g>
+            <g id="hilos"></g>
+            <g id="transitos" class="transito"></g>
+            <g id="nodos"></g>
+          </svg>
+        </div>
+        <aside class="lado">
+          <div class="panel" id="clima">
+            <h4 id="clima-titulo">El cielo de hoy</h4>
+            <div class="clima" id="clima-cuerpo"></div>
+            <div class="small" id="clima-luna" style="margin-top:8px;opacity:.85"></div>
+          </div>
+          <div class="panel" id="detalle">
+            <h4>Afinidades</h4>
+            <p class="vacio small" style="margin:0">Pasa el cursor por una estrella o por un hilo. Toca una estrella para fijarla.</p>
+          </div>
+          <div class="panel">
+            <div class="k">Leyenda</div>
+            <div class="leyenda" style="margin-top:8px">
+              <div><span class="hilo" style="color:var(--oro);background:var(--oro)"></span> Afinidad luminosa (trígonos, sextiles)</div>
+              <div><span class="hilo" style="color:var(--azul);background:var(--azul)"></span> Neutra, independiente</div>
+              <div><span class="hilo" style="color:var(--violeta);background:var(--violeta)"></span> Tensión creativa (cuadraturas, oposiciones)</div>
+              <div style="margin-top:4px"><span class="punto" style="color:var(--fuego);background:var(--fuego)"></span> Fuego <span class="punto" style="color:var(--tierra);background:var(--tierra);margin-left:8px"></span> Tierra <span class="punto" style="color:var(--aire);background:var(--aire);margin-left:8px"></span> Aire <span class="punto" style="color:var(--agua);background:var(--agua);margin-left:8px"></span> Agua</div>
+              <div class="small" style="opacity:.6">El grosor del hilo es la intensidad del vínculo; el color, su tono.</div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="k">Ajustes del mapa</div>
+            <div class="ctrls" style="margin-top:10px">
+              <div class="ctrl"><span>Tema</span><span class="seg" id="tema"><button data-v="noche" class="on">Noche</button><button data-v="alba">Alba</button></span></div>
+              <div class="ctrl"><span>Hilos visibles desde intensidad</span><input type="range" id="umbral" min="0" max="12" step="1" value="4"></div>
+              <div class="ctrl"><span>Grosor de los hilos</span><input type="range" id="grosor" min="0.5" max="2.5" step="0.1" value="1.2"></div>
+              <div class="ctrl"><span>Nombres</span><button class="sw on" id="sw-nombres"></button></div>
+              <div class="ctrl"><span>Luna y planetas de hoy</span><button class="sw on" id="sw-transitos"></button></div>
+              <div class="ctrl"><span>Movimiento</span><button class="sw on" id="sw-mov"></button></div>
+              <div class="ctrl"><span>Ver el cielo de otro día</span><input type="date" id="fecha" style="width:150px"></div>
+            </div>
+          </div>
+          <div class="panel probar" id="probar">
+            <div class="k">Pruébalo con tus datos</div>
+            <div class="small" style="opacity:.7;margin-top:-2px">Se calcula aquí mismo y no se guarda nada.</div>
+            <input type="text" id="p-nombre" placeholder="Tu nombre o apodo">
+            <div class="fila"><input type="date" id="p-fecha"><input type="time" id="p-hora" placeholder="Hora (opcional)"></div>
+            <input type="search" id="p-ciudad" placeholder="Ciudad donde naciste" autocomplete="off">
+            <div class="sug" id="p-sug"></div>
+            <div style="display:flex;gap:8px"><button class="boton" id="p-ok">Ver mi estrella</button><button class="boton sec" id="p-quitar" style="display:none">Quitar</button></div>
+            <div class="small" id="p-msg" style="opacity:.75"></div>
+          </div>
+        </aside>
+      </div>
+    </div>
+    <p class="small muted" style="margin-top:14px">Las ocho personas del mapa son inventadas, con fechas y ciudades al azar. Las posiciones planetarias sí son reales: se calculan en tu navegador con <a href="https://www.npmjs.com/package/astronomy-engine">astronomy-engine</a> para la fecha que marque el reloj.</p>
+  </div>
+</section>
+
+<!-- ============================== 1. QUÉ ES ============================== -->
+<section>
+  <div class="wrap">
+    <div class="eyebrow">1 · Cómo se llama esto</div>
+    <h2>Sinastría, tránsitos y una carta para dos</h2>
+    <p class="lead">Lo que describiste tiene nombre en astrología. Son tres técnicas que se complementan, y la app usaría las tres en capas.</p>
+    <div class="grid g3" style="margin-top:28px">
+      <div class="card">
+        <span class="pill">La base</span>
+        <h3 style="margin-top:12px">Sinastría</h3>
+        <p>Comparar dos cartas natales planeta por planeta. Se buscan los <b>aspectos cruzados</b>: ángulos entre el Sol de una persona y la Luna de otra, la Venus de una y el Marte de la otra. Es la técnica clásica de compatibilidad y es la que da el <b>mapa fijo</b> del equipo.</p>
+      </div>
+      <div class="card">
+        <span class="pill oro">El tiempo real</span>
+        <h3 style="margin-top:12px">Tránsitos</h3>
+        <p>Dónde están los planetas <b>hoy</b> respecto a cada carta. La Luna cambia de signo cada dos días y medio; Venus y Marte, cada mes o dos. Eso es lo que hace que el mapa <b>respire</b>: el clima de cada vínculo cambia a diario sin que nadie toque nada.</p>
+      </div>
+      <div class="card">
+        <span class="pill">La capa fina</span>
+        <h3 style="margin-top:12px">Carta compuesta</h3>
+        <p>Una carta nueva hecha con los <b>puntos medios</b> de las dos personas: describe a la relación como si fuera un tercer ser. Útil para una fase posterior, cuando cada pareja del equipo pueda abrir su propia ficha.</p>
+      </div>
+    </div>
+    <div class="nota" style="margin-top:22px">La palabra que buscabas para «tracking» es <b>tránsitos</b>. «Sinastría» es el análisis fijo entre dos cartas; los tránsitos son el reloj que lo mueve.</div>
+  </div>
+</section>
+
+<!-- ============================== 2. DATOS ============================== -->
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="eyebrow">2 · Qué datos pide el registro</div>
+    <h2>Cuatro campos, y sólo uno es indispensable</h2>
+    <p class="lead">El formulario de alta es corto a propósito. Cada dato que se pide tiene un porqué y una consecuencia si falta.</p>
+    <table style="margin-top:26px">
+      <thead><tr><th>Dato</th><th>¿Obligatorio?</th><th>Para qué sirve</th><th>Qué pasa si falta</th></tr></thead>
+      <tbody>
+        <tr><td><b>Nombre o apodo</b></td><td><span class="tag si">Sí</span></td><td>Etiqueta de la estrella.</td><td>No hay estrella.</td></tr>
+        <tr><td><b>Fecha de nacimiento</b></td><td><span class="tag si">Sí</span></td><td>Sol, Mercurio, Venus, Marte y planetas lentos. Con la fecha sola ya sale el 70 % del mapa.</td><td>No se puede calcular nada.</td></tr>
+        <tr><td><b>Hora de nacimiento</b></td><td><span class="tag op">Opcional</span></td><td>Ascendente (la «fachada» de la persona) y la Luna exacta. La Luna avanza 12 a 14° por día, así que a veces cambia de signo dentro del mismo día.</td><td>Sin Ascendente, y la Luna se calcula al mediodía: casi siempre acierta el signo, pero no el grado. La estrella lo indica con un punto discreto.</td></tr>
+        <tr><td><b>Ciudad de nacimiento</b></td><td><span class="tag op">Opcional</span></td><td>Latitud, longitud y <b>zona horaria</b> para convertir la hora local a tiempo universal. Sin lugar, la hora no sirve.</td><td>Se asume Tijuana. Para quien nació en otro huso cambia el Ascendente.</td></tr>
+        <tr><td><b>Foto o color</b></td><td><span class="tag no">No</span></td><td>Vestir la estrella. El color se puede derivar del elemento del Sol y no pedirse.</td><td>Nada.</td></tr>
+      </tbody>
+    </table>
+    <div class="grid g2" style="margin-top:22px">
+      <div class="card">
+        <h3>Privacidad, en corto</h3>
+        <p>La fecha de nacimiento es dato personal. El mapa muestra <b>signos y grados</b>, nunca la fecha ni la hora. El registro es voluntario, cada quien edita o borra lo suyo con su propio enlace, y el sitio tiene su propia clave de acceso, independiente de las herramientas de trabajo. Nada se comparte fuera del equipo.</p>
+      </div>
+      <div class="card">
+        <h3>Tono de los textos</h3>
+        <p>Es un juego, no una evaluación. Ningún vínculo se llama «incompatible»: las cuadraturas son <b>tensión creativa</b>, las oposiciones <b>espejo</b>. El sitio dice en su pie que la astrología describe dinámicas, no predice ni decide nada del trabajo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== 3. CÁLCULO ============================== -->
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="eyebrow">3 · Cómo se calcula</div>
+    <h2>Del formulario al hilo luminoso</h2>
+    <p class="lead">Todo corre en el navegador: no hace falta un servidor de cálculo ni pagar una API de astrología.</p>
+    <div class="flow" style="margin-top:26px">
+      <div class="step"><span class="n">1</span><b>Ciudad → coordenadas</b>Geocodificación de Open-Meteo: devuelve latitud, longitud y zona horaria. Sin llave, sin costo.</div>
+      <div class="step"><span class="n">2</span><b>Hora local → UTC</b>Con la zona horaria se convierte la hora de nacimiento a tiempo universal, respetando el horario de verano de aquel año.</div>
+      <div class="step"><span class="n">3</span><b>Posiciones</b>astronomy-engine (MIT, 116 KB) da la longitud eclíptica de Sol, Luna y planetas con precisión de 1 minuto de arco.</div>
+      <div class="step"><span class="n">4</span><b>Ascendente</b>Fórmula de tiempo sidéreo local; no requiere librería. Casas por signo entero, el sistema más simple y el más antiguo.</div>
+      <div class="step"><span class="n">5</span><b>Aspectos cruzados</b>Para cada pareja se buscan conjunciones, sextiles, cuadraturas, trígonos y oposiciones con orbe de 8° para Sol y Luna, 6° para el resto.</div>
+      <div class="step"><span class="n">6</span><b>Dos números por hilo</b>Intensidad (cuánto se activan) y tono (hacia dónde). Más el clima del día, que viene de los tránsitos.</div>
+    </div>
+
+    <div class="grid g2" style="margin-top:28px">
+      <div class="card">
+        <h3>Intensidad · método Discepolo</h3>
+        <p class="small muted">Es el único método de puntaje publicado con reglas claras. Mide cuánto se <b>activan</b> dos cartas entre sí, no si «se llevan bien».</p>
+        <table class="small">
+          <tbody>
+            <tr><td>Sol □ o ☍ Sol</td><td><b>8</b> (+3 si el orbe es ≤ 2°)</td></tr>
+            <tr><td>Sol ☌ Luna, en cada dirección</td><td><b>8</b> (+3 si ≤ 2°), puede contar dos veces</td></tr>
+            <tr><td>Cualquier aspecto mayor entre Sol, Luna y Ascendente</td><td><b>4</b> cada uno</td></tr>
+            <tr><td>Soles de la misma modalidad (cardinal, fija, mutable)</td><td><b>5</b></td></tr>
+            <tr><td>Venus con Marte, cada dirección</td><td><b>4</b> cada uno</td></tr>
+          </tbody>
+        </table>
+        <p class="small" style="margin-top:12px">Bandas: 0 a 5 mínima · 5 a 10 moderada · 10 a 15 significativa · 15 a 20 alta · 20 o más excepcional. Arriba de 25 es raro.</p>
+      </div>
+      <div class="card">
+        <h3>Tono · armonía</h3>
+        <p class="small muted">Propio, para darle color al hilo. Suma los aspectos cruzados entre Sol, Luna, Mercurio, Venus, Marte y Ascendente, ponderados por qué tan exactos son.</p>
+        <table class="small">
+          <tbody>
+            <tr><td>Trígono △ (120°)</td><td><b>+1.0</b></td></tr>
+            <tr><td>Sextil ⚹ (60°)</td><td><b>+0.6</b></td></tr>
+            <tr><td>Conjunción ☌ (0°)</td><td><b>+0.3</b></td></tr>
+            <tr><td>Oposición ☍ (180°)</td><td><b>−0.7</b></td></tr>
+            <tr><td>Cuadratura □ (90°)</td><td><b>−1.0</b></td></tr>
+            <tr><td>Elementos de los Soles y de las Lunas</td><td>mismo +0.6 · afines (fuego-aire, tierra-agua) +0.3 · otros −0.4</td></tr>
+          </tbody>
+        </table>
+        <p class="small" style="margin-top:12px">El total se comprime a un valor entre −1 y +1. Arriba de +0.2 el hilo es dorado; abajo de −0.2, violeta; en medio, azul.</p>
+      </div>
+    </div>
+    <div class="card" style="margin-top:18px">
+      <h3>El clima del día (lo que lo hace «en tiempo real»)</h3>
+      <p>Cada vez que alguien abre el mapa se calcula dónde están el Sol, la Luna, Venus y Marte <b>en ese momento</b>, y qué aspectos forman con el Sol, la Luna y el Ascendente de cada persona. La Luna «toca» a quien tenga el Sol, la Luna o el Ascendente a menos de 6° de ella (o un aspecto casi exacto), y esa estrella pulsa. Para cada pareja se escribe una frase del día: «la Luna en Géminis hace trígono al Sol de Aurora, día ligero entre ustedes». El mapa se vuelve a dibujar solo cada minuto y, en la versión real, también cuando alguien se registra.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== 4. EL MAPA ============================== -->
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="eyebrow">4 · El mapa</div>
+    <h2>Una constelación, no una tabla</h2>
+    <div class="grid g2" style="margin-top:26px">
+      <div class="card">
+        <h3>La metáfora</h3>
+        <p>Un anillo zodiacal apenas visible marca los doce signos. Cada persona es una estrella colocada <b>en el grado de su Sol</b>, así que de un vistazo se ve quiénes comparten signo o se oponen. Los hilos entre estrellas son los vínculos: su grosor es la intensidad, su color es el tono. La Luna de hoy recorre el anillo y enciende a quien toca.</p>
+      </div>
+      <div class="card">
+        <h3>Interacciones</h3>
+        <p><b>Rozar una estrella</b> ilumina sus hilos y atenúa el resto; aparece su ficha con Sol, Luna, Ascendente, Venus y Marte. <b>Rozar un hilo</b> abre la ficha de la pareja: intensidad, tono, los tres aspectos más exactos y la frase del día. <b>Tocar</b> fija la selección para celular.</p>
+      </div>
+      <div class="card">
+        <h3>Estados</h3>
+        <p>Las estrellas sin hora de nacimiento llevan un punto discreto: su Luna es aproximada y no tienen Ascendente. Cuando alguien nuevo se registra, su estrella <b>nace</b> con una animación y los hilos se tienden uno a uno. Al entrar, cada quien ve su estrella un poco más brillante.</p>
+      </div>
+      <div class="card">
+        <h3>Vistas posibles después</h3>
+        <p><b>Campo</b>: un diagrama de fuerzas donde la afinidad es cercanía física, sin anillo. <b>Mi cielo</b>: tu estrella al centro y las demás ordenadas por afinidad contigo. <b>Calendario</b>: qué días del mes se encienden más hilos del equipo.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== 5. ARQUITECTURA ============================== -->
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="eyebrow">5 · Cómo se construye</div>
+    <h2>Casa propia, aparte del trabajo</h2>
+    <p class="lead">Constelación no vive dentro de LA PIZARRA ni de ninguna herramienta institucional. Es un sitio independiente, con su propia base, su propio acceso y su propia dirección.</p>
+    <div class="grid g3" style="margin-top:26px">
+      <div class="card">
+        <h3>Datos</h3>
+        <p>Un proyecto de Supabase <b>propio</b> (el plan gratuito sobra) con una sola tabla: <code>personas</code> con nombre, fecha, hora, ciudad, coordenadas y zona horaria. Realtime de Supabase avisa al mapa cuando alguien se registra o se corrige, y la estrella aparece sin recargar.</p>
+      </div>
+      <div class="card">
+        <h3>Acceso</h3>
+        <p>Una clave propia del equipo para ver el mapa, sin relación con las claves de trabajo. Cada registro genera un <b>enlace personal</b> para editar o borrar lo propio sin cuenta ni contraseña.</p>
+      </div>
+      <div class="card">
+        <h3>Publicación</h3>
+        <p>Repositorio propio en GitHub y sitio estático en su propia dirección (GitHub Pages o Vercel, ambos gratuitos). Sin servidores que mantener; el cálculo corre en el navegador de quien lo abre.</p>
+      </div>
+    </div>
+    <div class="card" style="margin-top:18px">
+      <h3>Fases</h3>
+      <ol class="pasos" style="margin-top:12px">
+        <li><div><b>Mockup</b> (este documento). Mapa funcional con datos ficticios y el formulario de prueba que ya calcula la estrella de quien quiera.</div></li>
+        <li><div><b>Registro real.</b> Formulario de alta con geocodificación, colección en Supabase, enlace personal de edición. Un día de trabajo.</div></li>
+        <li><div><b>Mapa con el equipo.</b> El mapa lee la colección y se actualiza en vivo. Fichas de persona y de pareja con textos cuidados. Dos días.</div></li>
+        <li><div><b>Clima diario.</b> Frase del día por pareja y para el equipo; vistas «Campo» y «Mi cielo». Opcional: un aviso por correo o WhatsApp cuando la Luna toque a alguien.</div></li>
+      </ol>
+    </div>
+  </div>
+</section>
+
+<!-- ============================== FUENTES ============================== -->
+<section style="padding-top:0">
+  <div class="wrap">
+    <div class="eyebrow">Fuentes consultadas</div>
+    <ul class="fuentes" style="margin-top:14px">
+      <li><a href="https://kerykeion.net/content/learn-astrology/synastry-compatibility-scoring">Método Discepolo de puntaje de sinastría</a> (Kerykeion): el único esquema de puntos con reglas publicadas. Aclara que mide activación, no calidad del vínculo.</li>
+      <li><a href="https://stellium.readthedocs.io/en/stable/_modules/stellium/core/comparison.html">Stellium, código de comparación de cartas</a>: ejemplo de suma ponderada por orbe (trígono y sextil +1, conjunción +0.5, cuadratura −0.5, oposición −0.3).</li>
+      <li><a href="https://roxyapi.com/blogs/synastry-calculation-two-charts-developers">Cálculo de sinastría para desarrolladores</a> (RoxyAPI): convenciones de orbes fijos y proporcionales.</li>
+      <li><a href="https://www.npmjs.com/package/astronomy-engine">astronomy-engine</a>: posiciones planetarias en JavaScript, licencia MIT, precisión ±1′, modelos VSOP87 y NOVAS.</li>
+      <li><a href="https://open-meteo.com/en/docs/geocoding-api">Open-Meteo Geocoding API</a>: ciudad a coordenadas y zona horaria, sin llave para uso no comercial.</li>
+      <li><a href="https://cdn.jsdelivr.net/npm/@swisseph/browser@1.1.1/README.md">Swiss Ephemeris para navegador</a>: la alternativa de máxima precisión, descartada por licencia AGPL y peso.</li>
+      <li><a href="https://elsaelsa.com/astrology/what-is-the-difference-between-synastry-chart-and-a-composite-chart/">Sinastría vs. carta compuesta</a> y <a href="https://www.augurine.com/learn/synastry-vs-composite-vs-davison">sinastría, compuesta y Davison</a>: las tres técnicas y cómo se combinan.</li>
+      <li><a href="https://app.routines.club/blogs/cosmic/the-pattern-vs-co-star">Co-Star vs. The Pattern</a>: referencia de producto. Co-Star compara cartas con amigos y muestra cómo los tránsitos del día afectan cada relación; The Pattern presenta los tránsitos como ciclos con fecha de inicio y fin.</li>
+    </ul>
+  </div>
+</section>
+
+<footer><div class="wrap">Constelación · estudio de concepto · Los cálculos astronómicos son reales; la astrología describe dinámicas y no predice nada. Documento preparado para Leonardo González, Diseño y Medios.</div></footer>
+
+<script>
+(function(){
+'use strict';
+const A = window.Astronomy;
+const RAD = Math.PI/180;
+const norm = d => ((d%360)+360)%360;
+const SIGNOS = ['Aries','Tauro','Géminis','Cáncer','Leo','Virgo','Libra','Escorpio','Sagitario','Capricornio','Acuario','Piscis'];
+const GLIFOS = ['♈','♉','♊','♋','♌','♍','♎','♏','♐','♑','♒','♓'];
+const ELEM = ['fuego','tierra','aire','agua'];
+const MODAL = ['cardinal','fija','mutable'];
+const PLAN = {Sun:'Sol',Moon:'Luna',Mercury:'Mercurio',Venus:'Venus',Mars:'Marte',Asc:'Ascendente'};
+const PGL = {Sun:'☉',Moon:'☽',Mercury:'☿',Venus:'♀',Mars:'♂',Asc:'Asc'};
+const ASPECTOS = [{n:'conjunción',a:0,s:'☌'},{n:'sextil',a:60,s:'⚹'},{n:'cuadratura',a:90,s:'□'},{n:'trígono',a:120,s:'△'},{n:'oposición',a:180,s:'☍'}];
+const VAL = {0:0.3,60:0.6,120:1,90:-1,180:-0.7};
+
+const PERSONAS = [
+ {n:'Aurora',    y:1991,m:3, d:22,h:7, mi:40, c:'Tijuana',          lat:32.5149,lon:-117.0382,tz:'America/Tijuana'},
+ {n:'Mateo',     y:1988,m:11,d:5, h:null,     c:'Ciudad de México', lat:19.4326,lon:-99.1332, tz:'America/Mexico_City'},
+ {n:'Valentina', y:1995,m:7, d:14,h:15,mi:10, c:'Guadalajara',      lat:20.6597,lon:-103.3496,tz:'America/Mexico_City'},
+ {n:'Diego',     y:1990,m:1, d:28,h:23,mi:5,  c:'Monterrey',        lat:25.6866,lon:-100.3161,tz:'America/Monterrey'},
+ {n:'Camila',    y:1997,m:9, d:2, h:4, mi:30, c:'Mexicali',         lat:32.6245,lon:-115.4523,tz:'America/Tijuana'},
+ {n:'Rodrigo',   y:1986,m:5, d:17,h:null,     c:'Hermosillo',       lat:29.0729,lon:-110.9559,tz:'America/Hermosillo'},
+ {n:'Lucía',     y:1993,m:12,d:9, h:12,mi:0,  c:'Ensenada',         lat:31.8667,lon:-116.5964,tz:'America/Tijuana'},
+ {n:'Emilio',    y:1999,m:6, d:21,h:18,mi:45, c:'Puebla',           lat:19.0414,lon:-98.2063, tz:'America/Mexico_City'},
+];
+
+/* ---------- tiempo ---------- */
+function tzOffsetMin(date, tz){
+  const f = new Intl.DateTimeFormat('en-US',{timeZone:tz,hourCycle:'h23',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit'});
+  const p = Object.fromEntries(f.formatToParts(date).map(x=>[x.type,x.value]));
+  const asUTC = Date.UTC(+p.year,+p.month-1,+p.day,+p.hour%24,+p.minute,+p.second);
+  return (asUTC - date.getTime())/60000;
+}
+function zonedToUTC(y,mo,d,h,mi,tz){
+  const wall = Date.UTC(y,mo-1,d,h,mi);
+  let guess = wall;
+  for(let i=0;i<3;i++){ guess = wall - tzOffsetMin(new Date(guess),tz)*60000; }
+  return new Date(guess);
+}
+
+/* ---------- astronomía ---------- */
+function lonDe(body, date){
+  if(body==='Sun') return norm(A.SunPosition(date).elon);
+  if(body==='Moon') return norm(A.EclipticGeoMoon(date).lon);
+  const v = A.GeoVector(A.Body[body], date, true);
+  return norm(A.Ecliptic(v).elon);
+}
+function ascendente(date, lat, lon){
+  const gst = A.SiderealTime(date)*15;
+  const th = norm(gst+lon)*RAD, eps = 23.4393*RAD, ph = lat*RAD;
+  return norm(Math.atan2(Math.cos(th), -(Math.sin(th)*Math.cos(eps)+Math.tan(ph)*Math.sin(eps)))/RAD);
+}
+function carta(p){
+  const exacta = p.h!=null;
+  const fecha = zonedToUTC(p.y,p.m,p.d, exacta?p.h:12, exacta?(p.mi||0):0, p.tz||'America/Tijuana');
+  const c = {exacta, fecha};
+  for(const b of ['Sun','Moon','Mercury','Venus','Mars']) c[b]=lonDe(b,fecha);
+  c.Asc = exacta ? ascendente(fecha, p.lat, p.lon) : null;
+  return c;
+}
+const signo = l => Math.floor(norm(l)/30);
+const grado = l => Math.floor(norm(l)%30);
+const fmt = l => `${GLIFOS[signo(l)]} ${SIGNOS[signo(l)]} ${grado(l)}°`;
+const elemDe = l => ELEM[signo(l)%4];
+const colorElem = l => `var(--${elemDe(l)})`;
+
+/* ---------- aspectos ---------- */
+const sep = (a,b)=>{ const d=Math.abs(norm(a)-norm(b)); return d>180?360-d:d; };
+function aspecto(l1,l2,orb){ const d=sep(l1,l2); for(const asp of ASPECTOS){ const o=Math.abs(d-asp.a); if(o<=orb) return Object.assign({orb:o},asp); } return null; }
+const esLum = k => k==='Sun'||k==='Moon';
+const orbe = (k1,k2)=> (esLum(k1)||esLum(k2))?8:6;
+
+function intensidad(P,Q){
+  let pts=0; const det=[];
+  const ss = aspecto(P.Sun,Q.Sun,8); let paso1=false;
+  if(ss && (ss.a===90||ss.a===180)){ const b=ss.orb<=2?3:0; pts+=8+b; paso1=true; det.push(`Sol ${ss.s} Sol · ${8+b}`); }
+  const slConj = new Set();
+  [['Sun','Moon'],['Moon','Sun']].forEach(([k1,k2])=>{ const c=aspecto(P[k1],Q[k2],8); if(c&&c.a===0){ const b=c.orb<=2?3:0; pts+=8+b; slConj.add(k1+k2); det.push(`${PLAN[k1]} ☌ ${PLAN[k2]} · ${8+b}`);} });
+  const claves=['Sun','Moon','Asc'];
+  for(const k1 of claves){ if(P[k1]==null) continue; for(const k2 of claves){ if(Q[k2]==null) continue;
+    const a=aspecto(P[k1],Q[k2],orbe(k1,k2)); if(!a) continue;
+    if(k1==='Sun'&&k2==='Sun'&&paso1) continue;
+    if(a.a===0 && slConj.has(k1+k2)) continue;
+    pts+=4; det.push(`${PLAN[k1]} ${a.s} ${PLAN[k2]} · 4`);
+  }}
+  if(!paso1 && signo(P.Sun)%3===signo(Q.Sun)%3){ pts+=5; det.push(`Soles ${MODAL[signo(P.Sun)%3]}s · 5`); }
+  [['Venus','Mars'],['Mars','Venus']].forEach(([k1,k2])=>{ const a=aspecto(P[k1],Q[k2],6); if(a){ pts+=4; det.push(`${PLAN[k1]} ${a.s} ${PLAN[k2]} · 4`);} });
+  return {pts, det};
+}
+const banda = p => p<5?'mínima':p<10?'moderada':p<15?'significativa':p<20?'alta':'excepcional';
+function compatElem(l1,l2){ const e1=signo(l1)%4,e2=signo(l2)%4; if(e1===e2) return .6; if((e1+e2)%2===0) return .3; return -.4; }
+function armonia(P,Q){
+  const keys=['Sun','Moon','Mercury','Venus','Mars','Asc']; let s=0; const lista=[];
+  for(const k1 of keys){ if(P[k1]==null) continue; for(const k2 of keys){ if(Q[k2]==null) continue;
+    const o=orbe(k1,k2); const a=aspecto(P[k1],Q[k2],o); if(!a) continue;
+    const w=1-a.orb/o; const v=VAL[a.a]*w; s+=v; lista.push({k1,k2,a,w,v});
+  }}
+  s += compatElem(P.Sun,Q.Sun) + compatElem(P.Moon,Q.Moon);
+  lista.sort((x,y)=>Math.abs(y.v)-Math.abs(x.v));
+  return {h:Math.tanh(s/4), lista};
+}
+function tono(h){
+  if(h>=.55) return {t:'Afinidad luminosa',c:'var(--oro)'};
+  if(h>=.2) return {t:'Fluye',c:'var(--oro)'};
+  if(h>-.2) return {t:'Neutra, independiente',c:'var(--azul)'};
+  if(h>-.55) return {t:'Tensión creativa',c:'var(--violeta)'};
+  return {t:'Chispa fuerte',c:'var(--violeta)'};
+}
+
+/* ---------- tránsitos ---------- */
+function cielo(date){ const c={}; for(const b of ['Sun','Moon','Venus','Mars']) c[b]=lonDe(b,date); return c; }
+function climaPareja(P,Q,nombres,tr){
+  const out=[];
+  [['Moon',6],['Venus',4],['Mars',4],['Sun',4]].forEach(([t,o])=>{
+    [[P,nombres[0]],[Q,nombres[1]]].forEach(([C,nom])=>{
+      for(const k of ['Sun','Moon','Asc']){ if(C[k]==null) continue; const a=aspecto(tr[t],C[k],o); if(!a) continue;
+        const pos = VAL[a.a]>0; out.push({v:Math.abs(VAL[a.a])*(1-a.orb/o), txt:`${PLAN[t]} en ${SIGNOS[signo(tr[t])]} ${a.n==='conjunción'?'sobre '+(k==='Moon'?'la Luna':k==='Sun'?'el Sol':'el Ascendente'):'en '+a.n+' '+(k==='Moon'?'a la Luna':k==='Sun'?'al Sol':'al Ascendente')} de ${nom}`, pos});
+      }
+    });
+  });
+  out.sort((a,b)=>b.v-a.v);
+  return out.slice(0,2);
+}
+const fraseClima = c => c.pos ? 'día ligero entre ustedes' : 'día de roces que dan chispa';
+
+/* ---------- estado ---------- */
+const cartas = PERSONAS.map(p=>Object.assign({},p,{carta:carta(p)}));
+let extra = null; // persona de prueba
+let fechaVista = null; // null = ahora
+const ajustes = {umbral:4, grosor:1.2, nombres:true, transitos:true, mov:true};
+let pin = null; // {tipo:'nodo',i} | {tipo:'hilo',i,j}
+
+const $ = s=>document.querySelector(s);
+const svg=$('#svg'), gRing=$('#ring'), gHilos=$('#hilos'), gNodos=$('#nodos'), gTr=$('#transitos'), mapa=$('#mapa');
+const CX=400, CY=400, R_RING=330, R_GLIFO=358;
+const pos=(lon,r)=>{ const a=(180-lon)*RAD; return [CX+r*Math.cos(a), CY-r*Math.sin(a)]; };
+const NS='http://www.w3.org/2000/svg';
+const el=(t,attrs,parent)=>{ const e=document.createElementNS(NS,t); for(const k in attrs) e.setAttribute(k,attrs[k]); if(parent) parent.appendChild(e); return e; };
+
+function dibujarAnillo(){
+  gRing.innerHTML='';
+  el('circle',{cx:CX,cy:CY,r:R_RING},gRing);
+  el('circle',{cx:CX,cy:CY,r:R_RING-16,'stroke-dasharray':'1 5'},gRing);
+  for(let i=0;i<12;i++){
+    const [x1,y1]=pos(i*30,R_RING-16), [x2,y2]=pos(i*30,R_RING);
+    el('line',{x1,y1,x2,y2},gRing);
+    const [gx,gy]=pos(i*30+15,R_GLIFO);
+    const t=el('text',{x:gx,y:gy},gRing); t.textContent=GLIFOS[i];
+  }
+}
+
+function todas(){ return extra ? cartas.concat([extra]) : cartas; }
+function posiciones(lista){
+  // cada estrella en el grado de su Sol; el radio se ajusta para no encimarse
+  const out=[]; const radios=[215,165,262,190,240];
+  lista.forEach((p,i)=>{
+    let r=radios[0], ok=false;
+    for(const rr of radios){ const [x,y]=pos(p.carta.Sun,rr); if(out.every(q=>Math.hypot(q.x-x,q.y-y)>64)){ r=rr; ok=true; break; } }
+    if(!ok) r=radios[i%radios.length];
+    const [x,y]=pos(p.carta.Sun,r); out.push({x,y,r});
+  });
+  return out;
+}
+
+let vinculos=[]; // {i,j,I,H,lista,det}
+function calcularVinculos(lista){
+  vinculos=[];
+  for(let i=0;i<lista.length;i++) for(let j=i+1;j<lista.length;j++){
+    const P=lista[i].carta,Q=lista[j].carta; const I=intensidad(P,Q), H=armonia(P,Q);
+    vinculos.push({i,j,I:I.pts,det:I.det,H:H.h,lista:H.lista});
+  }
+}
+
+const fase = cartas.map((_,i)=>i*1.7);
+let P0=[]; // posiciones base
+function dibujar(){
+  const lista=todas(); P0=posiciones(lista); calcularVinculos(lista);
+  gHilos.innerHTML=''; gNodos.innerHTML='';
+  vinculos.forEach((v,k)=>{
+    const g=el('g',{'data-k':k},gHilos);
+    const path=el('path',{class:'hilo real',filter:'url(#hiloglow)'},g);
+    const ancho=el('path',{class:'hilo ancho'},g);
+    g.addEventListener('mouseenter',()=>{ if(!pin) foco({tipo:'hilo',k}); });
+    g.addEventListener('mouseleave',()=>{ if(!pin) foco(null); });
+    g.addEventListener('click',e=>{ e.stopPropagation(); pin={tipo:'hilo',k}; foco(pin); });
+  });
+  lista.forEach((p,i)=>{
+    const g=el('g',{class:'nodo'+(p.esTu?' tu':''),'data-i':i},gNodos);
+    el('circle',{class:'halo',r:16,fill:colorElem(p.carta.Sun),filter:'url(#glow2)'},g);
+    el('circle',{class:'anillo',r:12},g);
+    if(p.lunaToca) el('circle',{class:'luna-toca',r:14},g);
+    el('circle',{class:'cuerpo',r:5.5,fill:'var(--star)',filter:'url(#glow)'},g);
+    el('circle',{r:2.5,fill:colorElem(p.carta.Sun)},g);
+    if(!p.carta.exacta) el('circle',{cx:9,cy:-9,r:1.8,fill:'var(--label)',opacity:.6},g);
+    const t=el('text',{y:28,class:'nombre'},g); t.textContent=p.n;
+    g.addEventListener('mouseenter',()=>{ if(!pin) foco({tipo:'nodo',i}); });
+    g.addEventListener('mouseleave',()=>{ if(!pin) foco(null); });
+    g.addEventListener('click',e=>{ e.stopPropagation(); pin={tipo:'nodo',i}; foco(pin); });
+  });
+  svg.addEventListener('click',()=>{ pin=null; foco(null); });
+  aplicarAjustes(); colocar(0); actualizarClima(); if(pin) foco(pin);
+}
+
+function geometria(t){
+  const lista=todas();
+  return lista.map((p,i)=>{ const f=fase[i]||i*1.3; const dx=ajustes.mov?3.5*Math.sin(t*.00045+f):0, dy=ajustes.mov?3*Math.cos(t*.00038+f*1.3):0; return {x:P0[i].x+dx,y:P0[i].y+dy}; });
+}
+function colocar(t){
+  const g=geometria(t);
+  gNodos.querySelectorAll('.nodo').forEach((n,i)=>n.setAttribute('transform',`translate(${g[i].x.toFixed(2)} ${g[i].y.toFixed(2)})`));
+  gHilos.querySelectorAll('g').forEach(gr=>{
+    const v=vinculos[+gr.dataset.k]; const a=g[v.i], b=g[v.j];
+    const mx=(a.x+b.x)/2, my=(a.y+b.y)/2; const cx=mx+(CX-mx)*.35, cy=my+(CY-my)*.35;
+    const d=`M${a.x.toFixed(1)} ${a.y.toFixed(1)} Q${cx.toFixed(1)} ${cy.toFixed(1)} ${b.x.toFixed(1)} ${b.y.toFixed(1)}`;
+    gr.querySelectorAll('path').forEach(p=>p.setAttribute('d',d));
+  });
+}
+function aplicarAjustes(){
+  gHilos.querySelectorAll('g').forEach(gr=>{
+    const v=vinculos[+gr.dataset.k]; const p=gr.querySelector('.real');
+    const I=Math.pow(Math.min(v.I/25,1),1.3); const visible=v.I>=ajustes.umbral;
+    p.style.stroke=tono(v.H).c; p.style.strokeWidth=((0.5+3.4*I)*ajustes.grosor).toFixed(2);
+    p.style.opacity=visible?(0.22+0.65*I).toFixed(2):0; gr.style.display=visible?'':'none';
+  });
+  gNodos.querySelectorAll('.nombre').forEach(t=>t.style.display=ajustes.nombres?'':'none');
+  gTr.style.display=ajustes.transitos?'':'none';
+}
+
+function foco(sel){
+  mapa.classList.toggle('foco',!!sel);
+  gHilos.querySelectorAll('g').forEach(gr=>gr.querySelector('.real').classList.remove('on'));
+  gNodos.querySelectorAll('.nodo').forEach(n=>n.classList.remove('on','pin'));
+  const lista=todas();
+  if(!sel){ $('#detalle').innerHTML='<h4>Afinidades</h4><p class="vacio small" style="margin:0">Pasa el cursor por una estrella o por un hilo. Toca una estrella para fijarla.</p>'; return; }
+  if(sel.tipo==='nodo'){
+    const p=lista[sel.i]; const n=gNodos.querySelector(`[data-i="${sel.i}"]`); n.classList.add('on'); if(pin) n.classList.add('pin');
+    gHilos.querySelectorAll('g').forEach(gr=>{ const v=vinculos[+gr.dataset.k]; if(v.i===sel.i||v.j===sel.i){ gr.querySelector('.real').classList.add('on'); gNodos.querySelector(`[data-i="${v.i===sel.i?v.j:v.i}"]`).classList.add('on'); } });
+    const c=p.carta;
+    const afines=vinculos.filter(v=>v.i===sel.i||v.j===sel.i).map(v=>Object.assign({otro:lista[v.i===sel.i?v.j:v.i].n},v)).sort((a,b)=>b.I-a.I).slice(0,3);
+    $('#detalle').innerHTML=`<h4>${p.n}</h4><div class="k">${p.c||''}${c.exacta?'':' · sin hora: Luna aproximada'}</div>
+      <div class="ficha"><span>☉ Sol</span><span>${fmt(c.Sun)} · ${elemDe(c.Sun)}</span><span>☽ Luna</span><span>${fmt(c.Moon)}${c.exacta?'':' ≈'}</span><span>Asc</span><span>${c.Asc!=null?fmt(c.Asc):'<i style="opacity:.5">requiere hora</i>'}</span><span>☿ Mercurio</span><span>${fmt(c.Mercury)}</span><span>♀ Venus</span><span>${fmt(c.Venus)}</span><span>♂ Marte</span><span>${fmt(c.Mars)}</span></div>
+      <div class="k" style="margin-top:10px">Vínculos más intensos</div><ul class="lista">${afines.map(v=>`<li><span class="tono" style="color:${tono(v.H).c}"><i></i></span>${v.otro}<span class="orb">${v.I} pts · ${banda(v.I)}</span></li>`).join('')||'<li class="vacio">ninguno con esta configuración</li>'}</ul>`;
+  } else {
+    const v=vinculos[sel.k]; const gr=gHilos.querySelector(`[data-k="${sel.k}"]`); gr.querySelector('.real').classList.add('on');
+    [v.i,v.j].forEach(i=>gNodos.querySelector(`[data-i="${i}"]`).classList.add('on'));
+    const a=lista[v.i], b=lista[v.j]; const tn=tono(v.H);
+    const tr=cielo(fechaActual()); const cl=climaPareja(a.carta,b.carta,[a.n,b.n],tr);
+    $('#detalle').innerHTML=`<h4>${a.n} <span style="opacity:.5">y</span> ${b.n}</h4>
+      <div class="k">Intensidad</div><div class="medidor"><i style="width:${Math.min(v.I/25*100,100)}%"></i></div><div class="small">${v.I} puntos · ${banda(v.I)}</div>
+      <div class="k" style="margin-top:10px">Tono</div><div class="tono" style="color:${tn.c}"><i></i>${tn.t}</div>
+      <div class="k" style="margin-top:10px">Aspectos más exactos</div>
+      <ul class="lista">${v.lista.slice(0,3).map(x=>`<li><span class="asp">${x.a.s}</span><span>${PGL[x.k1]} ${PLAN[x.k1]} de ${a.n} ${x.a.n} ${PGL[x.k2]} ${PLAN[x.k2]} de ${b.n}</span><span class="orb">${x.a.orb.toFixed(1)}°</span></li>`).join('')||'<li class="vacio">sin aspectos mayores entre puntos personales</li>'}</ul>
+      <div class="k" style="margin-top:10px">${fechaVista?'Ese día':'Hoy'}</div>
+      <div class="small">${cl.length?cl.map(x=>`${x.txt}: <b>${fraseClima(x)}</b>.`).join(' '):'Sin tránsitos marcados entre ustedes. Día tranquilo.'}</div>`;
+  }
+}
+
+/* ---------- clima / tránsitos ---------- */
+function fechaActual(){ if(!fechaVista) return new Date(); const ahora=new Date(); return new Date(fechaVista.getTime()+ ((ahora.getUTCHours()*60+ahora.getUTCMinutes())*60000)); }
+function actualizarClima(){
+  const d=fechaActual(); const tr=cielo(d); const lista=todas();
+  const fF=new Intl.DateTimeFormat('es-MX',{weekday:'long',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit',timeZone:'America/Tijuana'});
+  $('#clima-titulo').textContent = fechaVista ? 'El cielo de ese día' : 'El cielo de hoy';
+  $('#clima-cuerpo').innerHTML = `<div style="flex-basis:100%;opacity:.65;font-size:12px">${fF.format(d)} (Tijuana)</div>` + ['Sun','Moon','Venus','Mars'].map(b=>`<span><span class="gl">${PGL[b]}</span><b>${PLAN[b]}</b> ${fmt(tr[b])}</span>`).join('');
+  // quién recibe la Luna
+  const tocados=[]; lista.forEach(p=>{ p.lunaToca=false; for(const k of ['Sun','Moon','Asc']){ if(p.carta[k]==null) continue; const a=aspecto(tr.Moon,p.carta[k],6); if(a && (a.a===0 || a.orb<=2.5)){ p.lunaToca=true; tocados.push(`${p.n} (${a.n} a su ${k==='Sun'?'Sol':k==='Moon'?'Luna':'Ascendente'})`); break; } } });
+  $('#clima-luna').innerHTML = tocados.length ? `La Luna toca hoy a <b>${tocados.join(', ')}</b>.` : 'La Luna no toca a nadie en este momento.';
+  // marcas en el anillo
+  gTr.innerHTML='';
+  ['Sun','Moon','Venus','Mars'].forEach(b=>{
+    const [x,y]=pos(tr[b],R_RING-8); const g=el('g',{transform:`translate(${x} ${y})`},gTr);
+    el('circle',{r:b==='Moon'?6:3.5,fill:b==='Moon'?'var(--oro)':'var(--star)',opacity:b==='Moon'?.95:.7,filter:'url(#glow)'},g);
+    const t=el('text',{y:b==='Moon'?-11:-9},g); t.textContent=PLAN[b];
+  });
+  // anillos de pulso
+  gNodos.querySelectorAll('.nodo').forEach((n,i)=>{ const p=lista[i]; let c=n.querySelector('.luna-toca'); if(p.lunaToca&&!c){ c=el('circle',{class:'luna-toca',r:14}); n.insertBefore(c,n.querySelector('.cuerpo')); } if(!p.lunaToca&&c) c.remove(); });
+}
+
+/* ---------- fondo de estrellas ---------- */
+const canvas=$('#fondo'); const ctx=canvas.getContext('2d'); let estrellas=[];
+function prepFondo(){ const r=mapa.getBoundingClientRect(); canvas.width=r.width*devicePixelRatio; canvas.height=r.height*devicePixelRatio; estrellas=Array.from({length:220},()=>({x:Math.random(),y:Math.random(),r:Math.random()*1.3+.3,f:Math.random()*6.28,s:Math.random()*.6+.3})); }
+function pintarFondo(t){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const alba=mapa.dataset.tema==='alba';
+  for(const e of estrellas){ const a=(alba?.35:.85)*(0.5+0.5*Math.sin(t*.001*e.s+e.f)); ctx.globalAlpha=a; ctx.fillStyle=alba?'#6b4fd8':'#ffffff'; ctx.beginPath(); ctx.arc(e.x*canvas.width,e.y*canvas.height,e.r*devicePixelRatio,0,6.283); ctx.fill(); }
+  ctx.globalAlpha=1;
+}
+
+/* ---------- loop ---------- */
+let ultimoMin=-1;
+function loop(t){ colocar(t); pintarFondo(t); const m=Math.floor(Date.now()/60000); if(m!==ultimoMin){ ultimoMin=m; if(!fechaVista) actualizarClima(); } requestAnimationFrame(loop); }
+
+/* ---------- controles ---------- */
+$('#tema').addEventListener('click',e=>{ const b=e.target.closest('button'); if(!b) return; mapa.dataset.tema=b.dataset.v; $('#tema').querySelectorAll('button').forEach(x=>x.classList.toggle('on',x===b)); });
+$('#umbral').addEventListener('input',e=>{ ajustes.umbral=+e.target.value; aplicarAjustes(); });
+$('#grosor').addEventListener('input',e=>{ ajustes.grosor=+e.target.value; aplicarAjustes(); });
+[['sw-nombres','nombres'],['sw-transitos','transitos'],['sw-mov','mov']].forEach(([id,k])=>{ $('#'+id).addEventListener('click',e=>{ ajustes[k]=!ajustes[k]; e.target.classList.toggle('on',ajustes[k]); aplicarAjustes(); }); });
+$('#fecha').addEventListener('change',e=>{ if(!e.target.value){ fechaVista=null; } else { const [y,m,d]=e.target.value.split('-').map(Number); fechaVista=new Date(Date.UTC(y,m-1,d,7,0)); } actualizarClima(); if(pin) foco(pin); });
+
+/* ---------- pruébalo ---------- */
+let ciudadSel=null, timer=null;
+$('#p-ciudad').addEventListener('input',e=>{ ciudadSel=null; clearTimeout(timer); const q=e.target.value.trim(); if(q.length<3){ $('#p-sug').innerHTML=''; return; } timer=setTimeout(()=>buscarCiudad(q),350); });
+async function buscarCiudad(q){
+  try{
+    const r=await fetch(`https://geocoding-api.open-meteo.com/v1/search?name=${encodeURIComponent(q)}&count=5&language=es&format=json`);
+    const j=await r.json(); const res=j.results||[];
+    $('#p-sug').innerHTML=res.map((c,i)=>`<button data-i="${i}">${c.name}${c.admin1?', '+c.admin1:''} · ${c.country||''} <span style="opacity:.5">(${c.timezone})</span></button>`).join('')||'<div class="small vacio">Sin resultados</div>';
+    $('#p-sug').querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{ const c=res[+b.dataset.i]; ciudadSel={lat:c.latitude,lon:c.longitude,tz:c.timezone,nombre:`${c.name}, ${c.country||''}`}; $('#p-ciudad').value=ciudadSel.nombre; $('#p-sug').innerHTML=''; }));
+  }catch(err){ $('#p-sug').innerHTML='<div class="small vacio">No se pudo consultar la geocodificación (¿sin red?)</div>'; }
+}
+$('#p-ok').addEventListener('click',()=>{
+  const nombre=($('#p-nombre').value||'Tú').trim(); const f=$('#p-fecha').value; const h=$('#p-hora').value;
+  if(!f){ $('#p-msg').textContent='Falta la fecha de nacimiento.'; return; }
+  const [y,m,d]=f.split('-').map(Number); let hh=null,mi=0; if(h){ [hh,mi]=h.split(':').map(Number); }
+  const lugar=ciudadSel||{lat:32.5149,lon:-117.0382,tz:'America/Tijuana',nombre:'Tijuana (supuesto)'};
+  const p={n:nombre,y,m,d,h:hh,mi,c:lugar.nombre,lat:lugar.lat,lon:lugar.lon,tz:lugar.tz,esTu:true};
+  p.carta=carta(p); extra=p; pin={tipo:'nodo',i:cartas.length}; dibujar(); foco(pin);
+  $('#p-quitar').style.display=''; $('#p-msg').textContent = hh==null ? 'Sin hora: tu Luna es aproximada y no hay Ascendente.' : (ciudadSel?'':'Sin ciudad: se asumió Tijuana para el Ascendente.');
+  $('#mockup').scrollIntoView({behavior:'smooth',block:'start'});
+});
+$('#p-quitar').addEventListener('click',()=>{ extra=null; pin=null; dibujar(); foco(null); $('#p-quitar').style.display='none'; $('#p-msg').textContent=''; });
+
+/* ---------- arranque ---------- */
+function arrancar(){
+  dibujarAnillo(); prepFondo(); dibujar(); requestAnimationFrame(loop);
+  window.addEventListener('resize',prepFondo);
+}
+if(A) arrancar(); else { $('#clima-cuerpo').innerHTML='<span class="vacio">No cargó astronomy-engine (¿sin red?).</span>'; }
+})();
+</script>
+</body>
+</html>

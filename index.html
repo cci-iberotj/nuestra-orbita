@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Constelación · afinidades del equipo</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%231b1744'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%23fff'/%3E%3Ccircle cx='8' cy='10' r='1.6' fill='%23ffd79a'/%3E%3Ccircle cx='24' cy='9' r='1.3' fill='%23c9b0ff'/%3E%3Ccircle cx='23' cy='23' r='1.6' fill='%23a9d8ff'/%3E%3Cpath d='M8 10L16 16L24 9M16 16L23 23' stroke='%23ffd79a' stroke-width='.8' opacity='.7'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="estilos.css">
+<script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">Equipo de Diseño y Medios</div>
+    <h1>Constelación<br><span class="serif" style="font-style:italic;font-weight:400;color:var(--ink2);font-size:.55em">el mapa de afinidades del equipo</span></h1>
+  </div>
+</header>
+
+<!-- ============ PUERTA ============ -->
+<section class="puerta" id="puerta" hidden>
+  <form id="puerta-form" autocomplete="off">
+    <p class="lead" style="font-size:15px;margin:0">Cada quien es una estrella y los hilos que las unen cambian con el cielo de cada día. Es cosa del equipo: entra con la clave que compartimos.</p>
+    <input type="password" id="clave" placeholder="Clave del equipo" autocomplete="current-password" required>
+    <button class="boton" id="puerta-ok" type="submit">Entrar</button>
+    <div class="msg" id="puerta-msg"></div>
+  </form>
+</section>
+
+<!-- ============ MAPA ============ -->
+<section id="mapa-wrap" hidden>
+  <div class="wrap">
+    <div class="mapa" id="mapa" data-tema="noche">
+      <canvas class="estrellas" id="fondo"></canvas>
+      <div class="nebula"></div>
+      <div class="aviso" id="aviso-demo" hidden><b>Mapa de demostración.</b> Nadie se ha registrado todavía: estas ocho personas son inventadas (llevan un punto tras el nombre). En cuanto alguien ponga su estrella, desaparecen.</div>
+      <div class="aviso" id="aviso-solo" hidden><b>Primera estrella.</b> Los hilos aparecen cuando alguien más se registre. Comparte la dirección con el equipo.</div>
+      <div class="aviso" id="aviso" hidden></div>
+      <div class="mapa-grid">
+        <div class="cielo">
+          <svg id="svg" viewBox="0 0 800 800" aria-label="Mapa de afinidades">
+            <defs>
+              <filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="3" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+              <filter id="glow2" x="-100%" y="-100%" width="300%" height="300%"><feGaussianBlur stdDeviation="9"/></filter>
+              <filter id="hiloglow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="1.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+            </defs>
+            <g class="ring" id="ring"></g>
+            <g id="hilos"></g>
+            <g id="transitos" class="transito"></g>
+            <g id="nodos"></g>
+          </svg>
+        </div>
+        <aside class="lado">
+
+          <!-- Tu estrella: alta, o lo tuyo si ya estás -->
+          <div class="panel probar" id="tu">
+            <div id="sin-base" hidden class="small vacio">Falta conectar la base (config.js). Mientras, el mapa enseña la demostración.</div>
+            <form id="f-form" autocomplete="off" class="probar" hidden>
+              <h4 id="f-titulo" style="margin:0">Tu estrella</h4>
+              <div class="small" style="opacity:.7;margin-top:-6px">El mapa enseña signos y grados; la fecha y la hora no se muestran a nadie.</div>
+              <label>Nombre o apodo<input type="text" id="f-nombre" maxlength="40" required placeholder="Como te dicen en el equipo"></label>
+              <div class="fila">
+                <label>Fecha de nacimiento<input type="date" id="f-fecha" required min="1900-01-01"></label>
+                <label>Hora (si la sabes)<input type="time" id="f-hora"></label>
+              </div>
+              <label>Ciudad donde naciste<input type="search" id="f-ciudad" placeholder="Escribe y elige de la lista"></label>
+              <div class="sug" id="f-sug"></div>
+              <div class="small" id="f-nota" style="opacity:.75"></div>
+              <div class="acciones"><button class="boton" id="f-ok" type="submit">Poner mi estrella</button><button class="boton sec" id="f-cancelar" type="button" hidden>Cancelar</button></div>
+              <div class="small" id="f-msg" style="opacity:.85"></div>
+            </form>
+            <div id="mia" hidden class="probar">
+              <h4 style="margin:0">Tu estrella</h4>
+              <div><b id="mia-nombre"></b><div class="small" id="mia-datos" style="opacity:.7"></div></div>
+              <div class="k">Tu enlace personal</div>
+              <div class="enlace"><input type="text" id="mia-enlace" readonly><button class="boton sec" id="mia-copiar" type="button">Copiar</button></div>
+              <div class="small" style="opacity:.7;margin-top:-4px">Con él corriges o borras tu estrella desde cualquier dispositivo. No hay cuenta ni contraseña: el enlace es la llave.</div>
+              <div class="acciones"><button class="boton sec" id="mia-ver" type="button">Ver mi estrella</button><button class="boton sec" id="mia-editar" type="button">Corregir mis datos</button><button class="boton peligro" id="mia-borrar" type="button">Borrar mi estrella</button></div>
+              <div class="small" id="mia-msg" style="opacity:.85"></div>
+            </div>
+          </div>
+
+          <div class="panel" id="clima">
+            <h4 id="clima-titulo">El cielo de hoy</h4>
+            <div class="clima" id="clima-cuerpo"></div>
+            <div class="small" id="clima-luna" style="margin-top:8px;opacity:.85"></div>
+          </div>
+          <div class="panel" id="detalle">
+            <h4>Afinidades</h4>
+            <p class="vacio small" style="margin:0">Pasa el cursor por una estrella o por un hilo. Toca una estrella para fijarla.</p>
+          </div>
+          <div class="panel">
+            <div class="k">Leyenda</div>
+            <div class="leyenda" style="margin-top:8px">
+              <div><span class="hilo" style="color:var(--oro);background:var(--oro)"></span> Afinidad luminosa (trígonos, sextiles)</div>
+              <div><span class="hilo" style="color:var(--azul);background:var(--azul)"></span> Neutra, independiente</div>
+              <div><span class="hilo" style="color:var(--violeta);background:var(--violeta)"></span> Tensión creativa (cuadraturas, oposiciones)</div>
+              <div style="margin-top:4px"><span class="punto" style="color:var(--fuego);background:var(--fuego)"></span> Fuego <span class="punto" style="color:var(--tierra);background:var(--tierra);margin-left:8px"></span> Tierra <span class="punto" style="color:var(--aire);background:var(--aire);margin-left:8px"></span> Aire <span class="punto" style="color:var(--agua);background:var(--agua);margin-left:8px"></span> Agua</div>
+              <div class="small" style="opacity:.6">El grosor del hilo es la intensidad del vínculo; el color, su tono. Un punto junto a la estrella: sin hora de nacimiento.</div>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="k">Ajustes del mapa</div>
+            <div class="ctrls" style="margin-top:10px">
+              <div class="ctrl"><span>Tema</span><span class="seg" id="tema"><button type="button" data-v="noche" class="on">Noche</button><button type="button" data-v="alba">Alba</button></span></div>
+              <div class="ctrl"><span>Hilos visibles desde intensidad</span><input type="range" id="umbral" min="0" max="12" step="1" value="4"></div>
+              <div class="ctrl"><span>Grosor de los hilos</span><input type="range" id="grosor" min="0.5" max="2.5" step="0.1" value="1.2"></div>
+              <div class="ctrl"><span>Nombres</span><button type="button" class="sw on" id="sw-nombres"></button></div>
+              <div class="ctrl"><span>Luna y planetas de hoy</span><button type="button" class="sw on" id="sw-transitos"></button></div>
+              <div class="ctrl"><span>Movimiento</span><button type="button" class="sw on" id="sw-mov"></button></div>
+              <div class="ctrl"><span>Ver el cielo de otro día</span><input type="date" id="fecha" style="width:150px"></div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+    <p class="small muted" style="margin-top:14px;text-align:center">Las posiciones planetarias son reales y se calculan en tu navegador para la hora que marque el reloj. <a href="concepto.html">Cómo funciona</a>.</p>
+  </div>
+</section>
+
+<footer><div class="wrap">Constelación · Es un juego del equipo, no una evaluación: la astrología describe dinámicas y no predice ni decide nada del trabajo. Cada quien edita o borra lo suyo con su enlace personal.</div></footer>
+
+<script src="config.js"></script>
+<script src="motor.js"></script>
+<script src="mapa.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

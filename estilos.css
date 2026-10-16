@@ -1,0 +1,134 @@
+/* Constelación · estilos. Los del mapa son los del estudio de concepto. */
+:root{
+  --bg:#f5f2fb; --bg2:#fbf7f2; --card:#ffffff; --line:#e6e0f3; --ink:#2b2544; --ink2:#5c5478; --ink3:#8b83a6;
+  --acc:#6b4fd8; --acc2:#c99a3b; --accsoft:#efe9ff; --goldsoft:#fbf1dc;
+  --r:18px; --shadow:0 10px 30px -18px rgba(60,40,120,.35);
+  /* mapa · noche */
+  --sky1:#0b1026; --sky2:#1b1744; --sky3:#2a1d5a; --ring:rgba(255,255,255,.14); --ringtxt:rgba(255,255,255,.55);
+  --star:#ffffff; --label:rgba(255,255,255,.82); --panel:rgba(14,16,40,.72); --paneltxt:#ece8ff; --panelline:rgba(255,255,255,.14);
+  --fuego:#ffb36b; --tierra:#a8e6a1; --aire:#a9d8ff; --agua:#c9b0ff;
+  --oro:#ffd79a; --violeta:#d4a6ff; --azul:#9fd3ff;
+}
+.mapa[data-tema="alba"]{
+  --sky1:#f3ecff; --sky2:#fde8dc; --sky3:#e9e0ff; --ring:rgba(80,60,140,.18); --ringtxt:rgba(80,60,140,.6);
+  --star:#6b4fd8; --label:#3a3160; --panel:rgba(255,255,255,.78); --paneltxt:#2b2544; --panelline:rgba(80,60,140,.15);
+  --fuego:#e2742b; --tierra:#3f9a4a; --aire:#3b82c4; --agua:#7a52d6;
+  --oro:#c99a3b; --violeta:#9b5de5; --azul:#4f8fd6;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Manrope,system-ui,sans-serif;font-weight:400;line-height:1.55;-webkit-font-smoothing:antialiased}
+body{min-height:100vh;background:linear-gradient(180deg,var(--bg) 0%,var(--bg2) 100%)}
+a{color:var(--acc)}
+h1,h2,h3,h4,.serif{font-family:"Cormorant Garamond",Georgia,serif;font-weight:500;letter-spacing:.005em;margin:0}
+h1{font-size:clamp(40px,6vw,64px);line-height:.98}
+p{margin:.4em 0 1em}
+.wrap{width:min(1120px,100% - 32px);margin:0 auto}
+.eyebrow{font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--ink3);font-weight:600}
+.lead{font-size:17px;color:var(--ink2);max-width:60ch}
+.muted{color:var(--ink3)}
+.small{font-size:14px}
+header.hero{padding:48px 0 24px;text-align:center}
+header.hero .wrap{display:grid;gap:12px;justify-items:center}
+header.hero .lead{margin:0 auto}
+footer{padding:36px 0 70px;color:var(--ink3);font-size:13px;text-align:center}
+.fallo{background:#fde8e8;color:#8a1c1c;padding:12px 16px;text-align:center;margin:0}
+[hidden]{display:none!important}
+
+/* ============== PUERTA ============== */
+.puerta{min-height:70vh;display:grid;place-items:center;padding:24px 16px}
+.puerta form{background:var(--card);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:28px 26px;display:grid;gap:12px;width:min(380px,100%);text-align:center}
+.puerta input{border:1px solid var(--line);border-radius:12px;padding:12px 14px;font:inherit;font-size:16px;text-align:center;letter-spacing:.08em;width:100%}
+.puerta input:focus{outline:2px solid var(--accsoft);border-color:var(--acc)}
+.puerta .msg{min-height:1.4em;font-size:14px;color:var(--ink2)}
+.boton{background:var(--acc);color:#fff;border:0;border-radius:999px;padding:10px 18px;font:inherit;font-weight:600;font-size:14px;cursor:pointer}
+.boton:disabled{opacity:.55;cursor:default}
+.boton.sec{background:transparent;border:1px solid var(--panelline);color:inherit}
+.boton.peligro{background:transparent;border:1px solid rgba(255,120,120,.5);color:inherit;opacity:.8}
+.mapa[data-tema="alba"] .boton.peligro{border-color:rgba(180,40,40,.4)}
+
+/* ============== MAPA ============== */
+.mapa{position:relative;border-radius:28px;overflow:hidden;background:radial-gradient(1200px 700px at 20% 10%,var(--sky3),transparent 60%),radial-gradient(900px 600px at 85% 90%,var(--sky3),transparent 60%),linear-gradient(160deg,var(--sky1),var(--sky2));box-shadow:0 40px 80px -40px rgba(30,20,80,.6);color:var(--paneltxt);transition:background .6s}
+.mapa canvas.estrellas{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.mapa .nebula{position:absolute;inset:0;pointer-events:none;background:
+  radial-gradient(600px 400px at 70% 30%,rgba(212,166,255,.16),transparent 70%),
+  radial-gradient(500px 500px at 30% 75%,rgba(255,215,154,.10),transparent 70%),
+  radial-gradient(400px 300px at 55% 60%,rgba(159,211,255,.10),transparent 70%);filter:blur(10px)}
+.mapa-grid{position:relative;display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:0;min-height:720px}
+@media (max-width:900px){.mapa-grid{grid-template-columns:1fr}}
+.cielo{position:relative;padding:18px}
+.cielo svg{width:100%;height:auto;display:block;overflow:visible}
+.lado{padding:22px 22px 22px 0;display:flex;flex-direction:column;gap:14px}
+@media (max-width:900px){.lado{padding:0 18px 18px}}
+.panel{background:var(--panel);backdrop-filter:blur(14px);border:1px solid var(--panelline);border-radius:18px;padding:16px 18px;font-size:14px}
+.panel h4{margin:0 0 8px;font-family:"Cormorant Garamond",serif;font-size:22px;font-weight:500}
+.panel .k{opacity:.6;font-size:11px;letter-spacing:.14em;text-transform:uppercase}
+.panel .ficha{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:8px 0}
+.panel .ficha span:nth-child(odd){opacity:.65}
+.panel .lista{margin:8px 0 0;padding:0;list-style:none;display:grid;gap:6px}
+.panel .lista li{display:flex;gap:8px;align-items:baseline}
+.panel .lista .asp{font-size:17px;width:20px;text-align:center}
+.panel .lista .orb{opacity:.5;font-size:12px;margin-left:auto;white-space:nowrap}
+.medidor{height:6px;border-radius:999px;background:rgba(127,127,160,.25);overflow:hidden;margin:6px 0 2px}
+.medidor i{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,var(--azul),var(--oro))}
+.tono{display:inline-flex;align-items:center;gap:8px;font-weight:600}
+.tono i{width:10px;height:10px;border-radius:50%;display:inline-block;box-shadow:0 0 12px currentColor}
+.leyenda{display:grid;gap:6px;font-size:13px}
+.leyenda div{display:flex;align-items:center;gap:10px}
+.leyenda .hilo{width:34px;height:3px;border-radius:2px;box-shadow:0 0 8px currentColor}
+.leyenda .punto{width:10px;height:10px;border-radius:50%;box-shadow:0 0 10px currentColor}
+.clima{display:flex;flex-wrap:wrap;gap:10px 18px;font-size:14px}
+.clima b{font-weight:600}
+.clima .gl{font-size:17px;margin-right:4px}
+.ctrls{display:grid;gap:10px}
+.ctrl{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;font-size:13px}
+.ctrl input[type=range]{width:120px;accent-color:var(--acc)}
+.seg{display:inline-flex;border:1px solid var(--panelline);border-radius:999px;overflow:hidden}
+.seg button{background:transparent;border:0;color:inherit;padding:5px 12px;font:inherit;font-size:12px;cursor:pointer;opacity:.7}
+.seg button.on{background:rgba(127,127,200,.25);opacity:1}
+.sw{position:relative;width:36px;height:20px;border-radius:999px;background:rgba(127,127,160,.35);border:0;cursor:pointer;transition:.2s}
+.sw::after{content:"";position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:.2s}
+.sw.on{background:var(--acc)}.sw.on::after{left:18px}
+.mapa input[type=date],.mapa input[type=time],.mapa input[type=text],.mapa input[type=search],.mapa input[readonly]{background:rgba(127,127,170,.15);border:1px solid var(--panelline);color:inherit;border-radius:10px;padding:7px 10px;font:inherit;font-size:13px;width:100%;min-width:0}
+.mapa input[type=date],.mapa input[type=time]{color-scheme:dark}
+.mapa[data-tema="alba"] input[type=date],.mapa[data-tema="alba"] input[type=time]{color-scheme:light}
+.vacio{opacity:.55;font-style:italic}
+.aviso{margin:10px 18px 0;padding:10px 14px;border-radius:12px;background:rgba(255,215,154,.14);border:1px solid rgba(255,215,154,.35);font-size:13px;position:relative}
+.mapa[data-tema="alba"] .aviso{background:rgba(201,154,59,.12);border-color:rgba(201,154,59,.35)}
+/* svg */
+.nodo{cursor:pointer}
+.nodo text{font-family:Manrope,sans-serif;font-size:13px;fill:var(--label);font-weight:500;text-anchor:middle;pointer-events:none}
+.nodo .halo{opacity:.35}
+.nodo.pin .anillo,.nodo:hover .anillo{opacity:1}
+.nodo .anillo{opacity:0;fill:none;stroke:var(--star);stroke-width:1;transition:opacity .3s}
+.nodo .luna-toca{fill:none;stroke:var(--oro);stroke-width:1.2;opacity:.9;animation:pulso 2.6s ease-in-out infinite}
+@keyframes pulso{0%,100%{r:14;opacity:.9}50%{r:20;opacity:.2}}
+.nodo.tu .halo{opacity:.7}
+.nodo.tu .cuerpo{r:7}
+.nodo.tu text{font-style:italic;font-weight:600}
+.nodo.demo text{font-style:italic;opacity:.75}
+.hilo{fill:none;stroke-linecap:round;cursor:pointer;transition:opacity .35s}
+.hilo.ancho{stroke:transparent;stroke-width:14}
+.mapa.foco .hilo:not(.on){opacity:.08!important}
+.mapa.foco .nodo:not(.on){opacity:.35}
+.ring text{font-size:15px;fill:var(--ringtxt);text-anchor:middle;dominant-baseline:middle}
+.ring line,.ring circle{stroke:var(--ring);fill:none}
+.transito text{font-size:11px;fill:var(--label);text-anchor:middle;letter-spacing:.06em;text-transform:uppercase;opacity:.8}
+/* nacer: la estrella nueva se enciende y sus hilos se tienden */
+.nodo.nace .cuerpo,.nodo.nace .nucleo,.nodo.nace .halo{animation:nacer 1.3s cubic-bezier(.2,.9,.25,1.2) var(--retraso,0s) both}
+.nodo.nace text{animation:aparecer .8s ease calc(var(--retraso,0s) + .7s) both}
+.nodo.nace .destello{animation:destello 1.6s ease-out var(--retraso,0s) both}
+@keyframes nacer{0%{transform:scale(0);opacity:0}55%{transform:scale(1.9);opacity:1}100%{transform:scale(1)}}
+@keyframes aparecer{from{opacity:0}to{opacity:1}}
+@keyframes destello{0%{r:3;opacity:.95;stroke-width:2}100%{r:46;opacity:0;stroke-width:.3}}
+.hilo.tiende{stroke-dasharray:1;stroke-dashoffset:1;animation:tender 1.4s ease-out both}
+@keyframes tender{to{stroke-dashoffset:0}}
+/* lista de ciudades */
+.sug{display:grid;gap:4px;margin-top:6px}
+.sug button{text-align:left;background:rgba(127,127,170,.12);border:1px solid var(--panelline);border-radius:8px;color:inherit;padding:6px 10px;font:inherit;font-size:12px;cursor:pointer}
+.sug button:hover{background:rgba(127,127,200,.25)}
+.probar{display:grid;gap:8px}
+.probar .fila{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.probar label{display:grid;gap:3px;font-size:11px;opacity:.75;letter-spacing:.04em}
+.probar label input{font-size:13px}
+.acciones{display:flex;gap:8px;flex-wrap:wrap}
+.enlace{display:grid;grid-template-columns:1fr auto;gap:6px}
