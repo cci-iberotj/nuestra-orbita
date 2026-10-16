@@ -9,7 +9,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='15' fill='%231b1744'/%3E%3Ccircle cx='16' cy='16' r='4' fill='%23fff'/%3E%3Ccircle cx='8' cy='10' r='1.6' fill='%23ffd79a'/%3E%3Ccircle cx='24' cy='9' r='1.3' fill='%23c9b0ff'/%3E%3Ccircle cx='23' cy='23' r='1.6' fill='%23a9d8ff'/%3E%3Cpath d='M8 10L16 16L24 9M16 16L23 23' stroke='%23ffd79a' stroke-width='.8' opacity='.7'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="estilos.css?v=2.7">
+<link rel="stylesheet" href="estilos.css?v=2.8">
 <script src="https://cdn.jsdelivr.net/npm/astronomy-engine@2.1.19/astronomy.browser.min.js"></script>
 <script type="importmap">
 { "imports": {
@@ -43,19 +43,6 @@
       <div class="aviso" id="aviso-solo" hidden><b>Primera estrella.</b> Los hilos aparecen cuando alguien más se registre. Comparte la dirección con el equipo.</div>
       <div class="aviso" id="aviso" hidden></div>
     </div>
-    <!-- sin sesión: la entrada -->
-    <div class="panel entrada" id="entrada" hidden>
-      <h4>Entra al mapa</h4>
-      <p class="intro">Cada quien del equipo es una estrella. Los hilos que las unen cambian con el cielo de cada día. No hay que saber nada de horóscopos.</p>
-      <form id="entrar-form" autocomplete="off">
-        <label>¿Cómo te dicen en el equipo?<input type="text" id="e-nombre" maxlength="24" autocomplete="username" required></label>
-        <label>Tu PIN<input type="password" id="e-pin" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="current-password" placeholder="····" required></label>
-        <button class="boton" type="submit" id="e-ok">Entrar</button>
-        <div class="msg" id="e-msg"></div>
-      </form>
-      <div class="o">¿Primera vez?</div>
-      <button class="boton sec" type="button" id="e-nuevo">Crear mi estrella</button>
-    </div>
     <!-- con sesión: los paneles -->
     <div class="panel" id="detalle" hidden></div>
     <div class="panel" id="mia" hidden></div>
@@ -74,6 +61,22 @@
   </aside>
 </main>
 
+<!-- ============ ENTRAR (nombre y PIN) ============ -->
+<div id="entrada-velo" class="velo" hidden>
+  <div class="tarjeta" id="entrada">
+    <h2>Entra al mapa</h2>
+    <p class="intro">Tu nombre o apodo y tu PIN de cuatro números.</p>
+    <form id="entrar-form" autocomplete="off">
+      <label>¿Cómo te dicen en el equipo?<input type="text" id="e-nombre" maxlength="24" autocomplete="username" required></label>
+      <label>Tu PIN<input type="password" id="e-pin" inputmode="numeric" pattern="[0-9]{4}" maxlength="4" autocomplete="current-password" placeholder="····" required></label>
+      <button class="boton" type="submit" id="e-ok">Entrar</button>
+      <div class="msg" id="e-msg"></div>
+    </form>
+    <div class="o">¿Primera vez aquí?</div>
+    <button class="boton sec" type="button" id="e-nuevo">Crear mi estrella</button>
+  </div>
+</div>
+
 <!-- ============ ALTA / PERFIL (por pasos) ============ -->
 <div id="alta" class="velo" hidden>
   <div class="tarjeta ancha">
@@ -88,6 +91,9 @@
         <button class="boton" type="submit" id="a-sig">Siguiente</button>
       </div>
     </form>
+    <div class="extras" id="a-primera" hidden>
+      <button type="button" class="enlace" id="a-entrar">¿Ya tienes tu estrella? Entra con tu nombre y PIN</button>
+    </div>
     <div class="extras" id="a-extras" hidden>
       <button type="button" class="enlace" id="a-pin">Cambiar mi PIN</button>
       <button type="button" class="enlace" id="a-salir">Salir de este navegador</button>
@@ -132,10 +138,10 @@
 
 <div class="version" id="version"></div>
 
-<script src="config.js?v=2.7"></script>
-<script src="motor.js?v=2.7"></script>
-<script src="textos.js?v=2.7"></script>
-<script src="lecturas.js?v=2.7"></script>
-<script type="module" src="app.js?v=2.7"></script>
+<script src="config.js?v=2.8"></script>
+<script src="motor.js?v=2.8"></script>
+<script src="textos.js?v=2.8"></script>
+<script src="lecturas.js?v=2.8"></script>
+<script type="module" src="app.js?v=2.8"></script>
 </body>
 </html>

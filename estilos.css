@@ -110,6 +110,8 @@ input[inputmode=numeric]{letter-spacing:.4em;text-align:center;font-size:22px}
 .etq.signo{font-family:"Cormorant Garamond",serif;font-size:12px;color:rgba(200,190,240,.6);letter-spacing:.08em;text-transform:uppercase}
 .etq.transito{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.75)}
 .etq.transito.luna{color:var(--oro);font-weight:600}
+.lado{opacity:0;transform:translateX(-18px);transition:opacity .9s ease,transform .9s ease}
+body.listo .lado{opacity:1;transform:none}
 .lado{position:absolute;left:14px;top:14px;bottom:14px;width:368px;display:flex;flex-direction:column;gap:10px;overflow:auto;z-index:2;scrollbar-width:thin;scrollbar-color:rgba(255,255,255,.15) transparent;padding-right:4px}
 .avisos{display:grid;gap:8px}
 .aviso{padding:10px 14px;border-radius:12px;background:rgba(255,215,154,.12);border:1px solid rgba(255,215,154,.3);font-size:13px;backdrop-filter:blur(8px)}
@@ -175,19 +177,19 @@ details.lectura summary::-webkit-details-marker{display:none}
 .carga{position:fixed;inset:0;z-index:100;display:grid;place-items:center;align-content:center;gap:18px;background:radial-gradient(900px 500px at 30% 20%,var(--sky3),transparent 60%),linear-gradient(170deg,var(--sky1),var(--sky2));transition:opacity .8s ease}
 .carga.fuera{opacity:0;pointer-events:none}
 .carga-cielo{position:relative;width:120px;height:120px}
+@media (min-width:901px){.carga{place-items:center;padding-left:390px}}
 .carga-cielo .estrella{position:absolute;left:50%;top:50%;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:#fff;box-shadow:0 0 18px 6px rgba(255,215,154,.55),0 0 60px 20px rgba(212,166,255,.25);animation:latir 2.2s ease-in-out infinite}
 .carga-cielo .orbita{position:absolute;inset:0;border-radius:50%;border:1px solid rgba(200,190,240,.25);transform:rotateX(62deg);animation:girar 3.2s linear infinite}
 .carga-cielo .orbita::after{content:"";position:absolute;left:50%;top:-3px;width:6px;height:6px;margin-left:-3px;border-radius:50%;background:var(--oro);box-shadow:0 0 10px 3px rgba(255,215,154,.6)}
 @keyframes girar{to{transform:rotateX(62deg) rotateZ(360deg)}}
 @keyframes latir{0%,100%{transform:scale(1)}50%{transform:scale(1.35)}}
-.carga-txt{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:20px;color:var(--ink2);letter-spacing:.02em}
+.carga-txt,.etq.carga-txt3d{font-family:"Cormorant Garamond",serif;font-style:italic;font-size:20px;color:var(--ink2);letter-spacing:.02em;text-shadow:none}
 .version{position:fixed;right:14px;bottom:4px;font-size:10px;color:rgba(255,255,255,.35);letter-spacing:.08em;z-index:3;pointer-events:none}
 
 /* ============== velos ============== */
 .velo{position:fixed;inset:0;background:rgba(5,7,24,.72);backdrop-filter:blur(6px);display:grid;place-items:center;padding:16px;z-index:50;overflow:auto}
 .velo .tarjeta{max-height:calc(100vh - 32px);overflow:auto}
-.panel.entrada{display:grid;gap:12px}
-.panel.entrada .intro{font-size:14px}
+#entrada .intro{font-size:14px}
 .tarjeta.recorrido{width:min(440px,100%)}
 .tarjeta.recorrido p{color:var(--ink2);font-size:15px}
 .fallo{background:#4a1c2b;color:#ffd0d0;padding:12px 16px;text-align:center;margin:0}

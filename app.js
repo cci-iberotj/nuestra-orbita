@@ -10,7 +10,7 @@
    La base se usa SÓLO a través de funciones (rpc) con el código de
    sesión; la tabla no se lee ni se escribe directo.
    ═══════════════════════════════════════════════════════════ */
-import { crearMapa } from './mapa3d.js?v=2.7';
+import { crearMapa } from './mapa3d.js?v=2.8';
 const M = window.Motor, T = window.Textos, L = window.Lecturas;
 const $ = s=>document.querySelector(s);
 const LS = {sesion:'orbita.sesion'};
@@ -42,9 +42,15 @@ let trHoy=null;
 function conSesion(){ return !!(yo&&sesion); }
 function pintarLado(){
   $('#nav-nombre').textContent = yo ? yo.nombre : 'Mi perfil';
-  $('#entrada').hidden=conSesion();
   ['#detalle','#mia','#clima'].forEach(s=>$(s).hidden=!conSesion());
   $('#nav').hidden=!conSesion();
+  if(conSesion()){ $('#entrada-velo').hidden=true; if(!editando) $('#alta').hidden=true; }
+}
+/* Sin sesión, lo único que hay en pantalla es la puerta: el alta
+   (primera vez) o la entrada con nombre y PIN (si ya hay estrella). */
+function puerta(cual){
+  if(cual==='alta'){ $('#entrada-velo').hidden=true; abrirAlta(false); }
+  else { $('#alta').hidden=true; $('#entrada-velo').hidden=false; $('#e-msg').textContent=''; setTimeout(()=>$('#e-nombre').focus(),80); }
 }
 function aviso(txt){ const a=$('#aviso'); a.innerHTML=txt||''; a.hidden=!txt; }
 
@@ -72,10 +78,11 @@ function refrescarMapa(){
   $('#aviso-demo').hidden=!demo;
   $('#aviso-solo').hidden=!(conSesion()&&filas&&filas.length===1);
   mapa.poner(lista,{miId:conSesion()?yo.id:null, descubiertos:conSesion()?yo.descubiertos:[]});
+  if(!document.body.classList.contains('listo')) setTimeout(()=>document.body.classList.add('listo'), 1100);
   trHoy=mapa.cielo();
   pintarClima(); pintarMia(); pintarDetalle(seleccion);
 }
-function cerrarSesion(){ sesion=''; yo=null; filas=null; guardar(LS.sesion,null); if(sondeo){ clearInterval(sondeo); sondeo=null; } seleccion=null; pintarLado(); refrescarMapa(); }
+function cerrarSesion(){ sesion=''; yo=null; filas=null; guardar(LS.sesion,null); if(sondeo){ clearInterval(sondeo); sondeo=null; } seleccion=null; document.body.classList.remove('listo'); pintarLado(); refrescarMapa(); puerta('entrar'); }
 async function abrirSesion(codigo){
   sesion=codigo; guardar(LS.sesion,codigo);
   await cargarMio(); if(!yo) return false;
@@ -244,7 +251,7 @@ function pintarFicha(){
   $('#paso-num').textContent='Tu perfil';
   $('#paso').innerHTML=`<h2>${d.nombre}</h2><p class="ayuda">Cambia sólo lo que quieras; se guarda al momento.</p><div class="resumen">${filas.map(([id,k,v])=>`<div class="resumen-fila"><div><div class="k">${k}</div><div>${esc(v)}</div></div><button type="button" class="boton mini sec" data-paso="${id}">Cambiar</button></div>`).join('')}</div>`;
   $('#paso').querySelectorAll('[data-paso]').forEach(b=>b.addEventListener('click',()=>{ pasoSolo=b.dataset.paso; paso=0; pintarPaso(); }));
-  $('#a-msg').textContent=''; $('#a-atras').hidden=true; $('#a-sig').textContent='Cerrar'; $('#a-extras').hidden=false;
+  $('#a-msg').textContent=''; $('#a-atras').hidden=true; $('#a-sig').textContent='Cerrar'; $('#a-extras').hidden=false; $('#a-primera').hidden=true; $('#alta .cerrar').hidden=false;
 }
 function pintarPaso(){
   if(editando && pasoSolo==null){ pintarFicha(); return; }
@@ -258,7 +265,7 @@ function pintarPaso(){
   $('#a-msg').textContent='';
   $('#a-atras').hidden=!editando && paso===0; $('#a-atras').textContent= editando&&paso===0 ? 'Cancelar' : 'Atrás';
   $('#a-sig').textContent = paso===activos.length-1 ? (editando?'Guardar':'Poner mi estrella') : 'Siguiente';
-  $('#a-extras').hidden=true;
+  $('#a-extras').hidden=true; $('#a-primera').hidden=editando; $('#alta .cerrar').hidden=!editando;
   const inp=$('#paso input'); if(inp&&inp.type!=='date') setTimeout(()=>inp.focus(),50);
 }
 function cargarDatosDeYo(){
@@ -290,7 +297,7 @@ $('#alta-form').addEventListener('submit',async e=>{
       pasoSolo=null; cargarDatosDeYo(); pintarPaso(); $('#a-msg').textContent='Guardado.';
     } else {
       const r=await rpc('registrar',Object.assign({pin:datos.pin},args));
-      cerrarAlta(); await abrirSesion(r.codigo);
+      guardar('orbita.conocido','1'); cerrarAlta(); await abrirSesion(r.codigo);
       setTimeout(()=>mapa.fijar(yo.id),1600);
       if(yo&&!yo.recorrido&&yo.nivel!=='bastante') setTimeout(()=>abrirRecorrido(),2400);
     }
@@ -312,11 +319,12 @@ $('#entrar-form').addEventListener('submit',async e=>{
   const nombre=$('#e-nombre').value.trim(), pin=$('#e-pin').value;
   if(!/^\d{4}$/.test(pin)){ $('#e-msg').textContent='El PIN son cuatro números.'; return; }
   $('#e-ok').disabled=true; $('#e-msg').textContent='Abriendo…';
-  try{ const r=await rpc('entrar',{nombre,pin}); $('#e-msg').textContent=''; $('#e-pin').value=''; await abrirSesion(r.codigo); setTimeout(()=>mapa.fijar(yo.id),1200); }
+  try{ const r=await rpc('entrar',{nombre,pin}); guardar('orbita.conocido','1'); $('#e-msg').textContent=''; $('#e-pin').value=''; await abrirSesion(r.codigo); setTimeout(()=>mapa.fijar(yo.id),2600); }
   catch(err){ $('#e-msg').textContent = err.codigo==='28000' ? 'Ese nombre y PIN no coinciden.' : err.message; }
   $('#e-ok').disabled=false;
 });
-$('#e-nuevo').addEventListener('click',()=>abrirAlta(false));
+$('#e-nuevo').addEventListener('click',()=>puerta('alta'));
+$('#a-entrar').addEventListener('click',()=>puerta('entrar'));
 
 /* ---------- recorrido y glosario ---------- */
 let rPaso=0;
@@ -335,6 +343,7 @@ $('#b-perfil').addEventListener('click',()=>abrirAlta(true));
    un clic fuera no tire lo que ya se contestó. */
 function cerrarVelo(v){
   if(!v||v.hidden) return;
+  if(v.id==='entrada-velo' || (v.id==='alta' && !editando)) return;   // sin sesión no hay a dónde volver
   if(v.id==='recorrido') cerrarRecorrido();
   else if(v.id==='alta') cerrarAlta();
   else v.hidden=true;
@@ -354,8 +363,8 @@ async function arrancar(){
   pintarLado();
   document.addEventListener('visibilitychange',()=>{ if(!document.hidden&&conSesion()) cargar(false); });
   setInterval(()=>{ if(mapa&&lista.length){ trHoy=mapa.cielo(); pintarClima(); } },60000);
-  if(sesion){ const ok=await abrirSesion(sesion); if(ok){ setTimeout(()=>mapa.fijar(yo.id),1500); quitarCarga(); return; } }
-  refrescarMapa(); quitarCarga();
+  if(sesion){ const ok=await abrirSesion(sesion); if(ok){ setTimeout(()=>mapa.fijar(yo.id),2600); quitarCarga(); return; } }
+  refrescarMapa(); quitarCarga(); puerta(leer('orbita.conocido')?'entrar':'alta');
 }
 /* El velo de carga se va cuando el mapa ya tiene con qué dibujarse;
    pase lo que pase, a los 8 s se quita solo. */
