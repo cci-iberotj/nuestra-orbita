@@ -30,11 +30,11 @@ const ELEMENTO_FRASE = {fuego:'fuego (impulso)', tierra:'tierra (lo práctico)',
 /* ---------- vínculos ---------- */
 const ASPECTO_LLANO = {0:'conjunción', 60:'armonía (sextil)', 120:'armonía (trígono)', 90:'tensión (cuadratura)', 180:'tensión (oposición)'};
 const TONO_LLANO = {
-  'Afinidad luminosa':    {t:'Afinidad alta', d:'Casi todos los aspectos entre sus cartas son armónicos.'},
-  'Fluye':                {t:'Afinidad',      d:'Predominan los aspectos armónicos.'},
+  'Afinidad luminosa':    {t:'Buena afinidad (alta)', d:'Casi todos los aspectos entre sus cartas son armónicos.'},
+  'Fluye':                {t:'Buena afinidad', d:'Predominan los aspectos armónicos.'},
   'Neutra, independiente':{t:'Neutral',       d:'Sin aspectos marcados en ningún sentido.'},
   'Tensión creativa':     {t:'Tensión',       d:'Predominan los aspectos de tensión: fricción y también impulso.'},
-  'Chispa fuerte':        {t:'Tensión alta',  d:'Casi todos los aspectos entre sus cartas son de tensión.'},
+  'Chispa fuerte':        {t:'Tensión (alta)', d:'Casi todos los aspectos entre sus cartas son de tensión.'},
 };
 const INTENSIDAD_LLANA = {
   'mínima':'intensidad mínima', 'moderada':'intensidad moderada', 'significativa':'intensidad significativa',
@@ -115,7 +115,7 @@ function fraseDia(cl){
   return cl.map(x=>{
     const t = x.txt.replace(/ sobre el Sol de /,' en conjunción con el signo solar de ').replace(/ sobre la Luna de /,' en conjunción con el signo lunar de ').replace(/ sobre el Ascendente de /,' en conjunción con el ascendente de ')
       .replace(/ al Sol de /,' al signo solar de ').replace(/ a la Luna de /,' al signo lunar de ').replace(/ al Ascendente de /,' al ascendente de ');
-    return `${t}: <b>${x.pos?'armonía':'tensión'}</b>.`;
+    const L=window.Lecturas; return `${t}: <b>${x.pos?'armonía':'tensión'}</b>${L?', '+L.leerDia(x):''}.`;
   }).join(' ');
 }
 

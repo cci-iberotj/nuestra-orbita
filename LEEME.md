@@ -44,6 +44,16 @@ Los hilos **se descubren** tocándolos (o tocando la estrella de alguien y
 «Mi perfil» (arriba a la derecha) corrige todo, cambia el PIN, cierra la
 sesión en ese navegador o borra la estrella.
 
+## Las lecturas
+
+Lo que dice cada signo, cada aspecto y el cielo del día vive en
+`lecturas.js`, en términos concretos y sin género. Sigue la lectura
+clásica de la astrología occidental moderna (Stephen Arroyo para los
+elementos, Liz Greene para los signos, Sue Tompkins para los aspectos,
+Robert Hand para los tránsitos), resumida para esta página. Describe
+tendencias y dinámicas; no juzga ni predice. Para cambiar una lectura
+se edita ahí y nada más.
+
 ---
 
 ## Dónde viven los datos
@@ -88,7 +98,8 @@ minuto.
 |---|---|
 | `index.html` | la página: mapa, entrada, alta por pasos, glosario, recorrido |
 | `motor.js` | el cálculo: cartas, aspectos, intensidad (Discepolo), tono, tránsitos, etapas |
-| `textos.js` | todo lo dicho en llano: puntos de la carta, vínculos, glosario, recorrido, las doce palabras |
+| `textos.js` | los términos de la página: puntos de la carta, tipos de vínculo, glosario, recorrido, las doce palabras |
+| `lecturas.js` | qué dice cada signo, cada aspecto entre dos cartas y el cielo de hoy |
 | `mapa3d.js` | la bóveda en Three.js: anillo, estrellas, hilos, cielo de hoy, nacer |
 | `app.js` | sesión, alta, paneles, descubrimientos, sondeo cada 15 s |
 | `estilos.css` | estilos (noche siempre; sin ajustes para quien entra) |

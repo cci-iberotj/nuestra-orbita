@@ -156,6 +156,16 @@ input[inputmode=numeric]{letter-spacing:.4em;text-align:center;font-size:22px}
 .pulsa{animation:latido 1.6s ease-in-out infinite}
 @keyframes latido{0%,100%{box-shadow:0 0 0 0 rgba(255,215,154,.35)}50%{box-shadow:0 0 0 8px rgba(255,215,154,0)}}
 
+/* ============== lecturas ============== */
+details.lectura{margin:8px 0 4px;border:1px solid var(--panelline);border-radius:12px;padding:0 12px;background:rgba(255,255,255,.03)}
+details.lectura summary{cursor:pointer;padding:9px 0;font-size:13px;color:var(--acc2);list-style:none;display:flex;align-items:center;gap:8px}
+details.lectura summary::before{content:"";width:0;height:0;border-left:6px solid var(--acc2);border-top:4px solid transparent;border-bottom:4px solid transparent;transition:transform .2s}
+details.lectura[open] summary::before{transform:rotate(90deg)}
+details.lectura summary::-webkit-details-marker{display:none}
+.lectura-parte{padding:6px 0 10px;font-size:13px;line-height:1.5;color:var(--ink2)}
+.lectura-parte .k{margin-bottom:3px}
+.lectura-texto{color:var(--ink2);line-height:1.5}
+
 /* ============== glosario ============== */
 #glosario-lista{margin:0;display:grid;gap:14px}
 #glosario-lista dt{font-family:"Cormorant Garamond",serif;font-size:21px}

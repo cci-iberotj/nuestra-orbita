@@ -10,8 +10,8 @@
    La base se usa SÓLO a través de funciones (rpc) con el código de
    sesión; la tabla no se lee ni se escribe directo.
    ═══════════════════════════════════════════════════════════ */
-import { crearMapa } from './mapa3d.js?v=2.6';
-const M = window.Motor, T = window.Textos;
+import { crearMapa } from './mapa3d.js?v=2.7';
+const M = window.Motor, T = window.Textos, L = window.Lecturas;
 const $ = s=>document.querySelector(s);
 const LS = {sesion:'orbita.sesion'};
 const guardar=(k,v)=>{ try{ v==null?localStorage.removeItem(k):localStorage.setItem(k,v); }catch(e){} };
@@ -107,8 +107,9 @@ function pintarMia(){
   const comp=T.comparar(yo.palabras,p.carta,yo.pronombre);
   const falta=M.faltante(p);
   $('#mia').innerHTML=`<h4>${yo.nombre} <span class="muted" style="font-size:14px;font-family:Manrope">· tu estrella</span></h4>
-    <div class="small" style="margin-bottom:10px">${T.descripcionEstrella(p.carta,true)}</div>
-    <div class="k">Etapa ${p.etapa} de 3</div>
+    <div class="small">${T.descripcionEstrella(p.carta,true)}</div>
+    <details class="lectura"><summary>Leer mi carta</summary>${L.leerPersona(p.carta,true).map(x=>`<div class="lectura-parte"><div class="k">${x.t}</div><div>${x.d}</div></div>`).join('')}</details>
+    <div class="k" style="margin-top:10px">Etapa ${p.etapa} de 3</div>
     <div class="etapas"><i class="${p.etapa>=1?'on':''}"></i><i class="${p.etapa>=2?'on':''}"></i><i class="${p.etapa>=3?'on':''}"></i></div>
     <div class="small">${falta||'Perfil completo: signo solar, signo lunar y ascendente.'}</div>
     ${falta?'<div class="cta"><button type="button" class="boton mini" id="mia-completar">Completar mi perfil</button></div>':''}
@@ -140,6 +141,7 @@ function pintarDetalle(sel, fijo){
     const v=!yoMismo&&!p.demo?vinculoCon(p.id):null;
     d.innerHTML=`<h4>${p.n}${yoMismo?' <span class="muted" style="font-size:14px;font-family:Manrope">· tú</span>':''}</h4>
       <div class="k">${notas.join(' · ')}</div>${fichaDe(c)}
+      <details class="lectura"><summary>${yoMismo?'Leer mi carta':'Leer su carta'}</summary>${L.leerPersona(c,yoMismo).map(x=>`<div class="lectura-parte"><div class="k">${x.t}</div><div>${x.d}</div></div>`).join('')}</details>
       <div class="k" style="margin-top:10px">Vínculos más intensos</div>
       <ul class="lista">${afines.map(x=>`<li><span class="tono" style="color:${T.tonoLlano(x.H).c}"><i></i></span>${x.otro.n}<span class="orb">${T.intensidadLlana(x.I)}</span></li>`).join('')||'<li class="vacio">todavía no hay nadie más en el mapa</li>'}</ul>
       ${v?`<div class="cta"><button type="button" class="boton mini ${descubiertos().has(p.id)?'sec':'pulsa'}" id="d-hilo">${descubiertos().has(p.id)?'Ver nuestro hilo':'Descubrir nuestro hilo'}</button></div>`:(!yoMismo&&!p.demo&&yo?'<div class="small muted" style="margin-top:8px">Entre tú y '+p.n+' la intensidad es mínima: no hay aspectos marcados entre sus cartas.</div>':'')}`;
@@ -154,6 +156,7 @@ function pintarDetalle(sel, fijo){
       <div class="k" style="margin-top:10px">Tipo de vínculo</div><div class="tono" style="color:${tn.c}"><i></i>${tn.t}</div><div class="small muted">${tn.d}</div>
       <div class="k" style="margin-top:10px">Aspectos principales</div>
       <ul class="lista">${v.lista.slice(0,3).map(x=>{ const xx=(tuyo&&p1===b)?Object.assign({},x,{k1:x.k2,k2:x.k1}):x; return `<li>${T.porque(xx,p1.n,p2.n,tuyo)}</li>`; }).join('')||'<li class="vacio">sin aspectos marcados entre sus cartas</li>'}</ul>
+      <div class="k" style="margin-top:10px">Lectura del vínculo</div><div class="small lectura-texto">${L.leerVinculo(v).join(' ')}</div>
       <div class="k" style="margin-top:10px">Hoy</div><div class="small">${T.fraseDia(cl)}</div>`;
     if(tuyo&&fijo) descubrir(otro.id);
   }
