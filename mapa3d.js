@@ -214,17 +214,17 @@ export function crearMapa(contenedor, {alSeleccionar, alIntro, alIntroFin, semil
     });
 
     vinculos.forEach((v,k)=>{
-      if(!v.visible) return;
+      const debil=!v.visible;   // intensidad mínima: se dibuja apenas, para que no parezca que falta
       const a=P[v.i], b=P[v.j]; const medio=a.clone().add(b).multiplyScalar(.5);
       const control=medio.clone().multiplyScalar(.55); control.y=medio.y+.35;
       const curva=new THREE.QuadraticBezierCurve3(a,control,b); const puntos=curva.getPoints(36);
       const geo=new LineGeometry(); geo.setPositions(puntos.flatMap(q=>[q.x,q.y,q.z]));
       const I=Math.pow(Math.min(v.I/25,1),1.3);
-      const mat=new LineMaterial({color:TONO_COLOR[M.tono(v.H).c],linewidth:1+3.4*I,transparent:true,opacity:.16+.5*I,depthWrite:false,blending:THREE.AdditiveBlending});
+      const mat=new LineMaterial({color:debil?COLOR.azul:TONO_COLOR[M.tono(v.H).c],linewidth:debil?.9:1+3.4*I,transparent:true,opacity:debil?.09:.16+.5*I,depthWrite:false,blending:THREE.AdditiveBlending});
       mat.resolution.copy(tam);
       const linea=new Line2(geo,mat); linea.computeLineDistances(); linea.userData={tipo:'hilo',k};
       escena.add(linea);
-      const hilo={v,k,linea,mat,I,opacidad:.16+.5*I,ancho:1+3.4*I,segmentos:puntos.length-1};
+      const hilo={v,k,linea,mat,I,debil,opacidad:debil?.09:.16+.5*I,ancho:debil?.9:1+3.4*I,segmentos:puntos.length-1};
       hilos.push(hilo);
       if(nuevos.has(v.a.id)||nuevos.has(v.b.id)){ geo.instanceCount=0; animaciones.push({t:0,dur:1.3,retraso:primera?1.4+Math.max(v.i,v.j)*.08:.7,paso:f=>{ geo.instanceCount=Math.round(f*hilo.segmentos); }}); }
     });
@@ -294,8 +294,9 @@ export function crearMapa(contenedor, {alSeleccionar, alIntro, alIntroFin, semil
       const otro = mio ? (h.v.a.id===miId?h.v.b.id:h.v.a.id) : null;
       const descubierto = !miId || !mio || descubiertos.has(otro);
       let on = !sel || (sel.tipo==='hilo' ? h.k===hiloSel : (h.v.i===sel.i||h.v.j===sel.i));
-      h.mat.opacity = on ? h.opacidad*(descubierto?1:.4) : .05;
-      h.mat.linewidth = on ? h.ancho*(descubierto?1:.6) : h.ancho*.5;
+      const propio = sel && on;   // seleccionado o de la estrella seleccionada
+      h.mat.opacity = h.debil ? (propio?.45:(sel?.03:.09)) : (on ? h.opacidad*(descubierto?1:.4) : .05);
+      h.mat.linewidth = h.debil ? (propio?1.4:.9) : (on ? h.ancho*(descubierto?1:.6) : h.ancho*.5);
       h.linea.userData.descubierto=descubierto;
     });
     controles.autoRotate=!seleccion && introHecha;

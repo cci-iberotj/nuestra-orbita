@@ -10,7 +10,7 @@
    La base se usa SÓLO a través de funciones (rpc) con el código de
    sesión; la tabla no se lee ni se escribe directo.
    ═══════════════════════════════════════════════════════════ */
-import { crearMapa } from './mapa3d.js?v=2.13';
+import { crearMapa } from './mapa3d.js?v=2.14';
 const M = window.Motor, T = window.Textos, L = window.Lecturas;
 const $ = s=>document.querySelector(s);
 const LS = {sesion:'orbita.sesion'};
@@ -151,24 +151,41 @@ function pintarDetalle(sel, fijo){
     d.innerHTML=`<h4>${p.n}${yoMismo?' <span class="muted" style="font-size:14px;font-family:Manrope">· tú</span>':''}</h4>
       <div class="k">${notas.join(' · ')}</div>${fichaDe(c)}
       <details class="lectura"><summary>${yoMismo?'Leer mi carta':'Leer su carta'}</summary>${L.leerPersona(c,yoMismo).map(x=>`<div class="lectura-parte"><div class="k">${x.t}</div><div>${x.d}</div></div>`).join('')}</details>
-      <div class="k" style="margin-top:10px">Hoy</div><div class="small">${(()=>{ const l=T.diaPersona(c, yoMismo?'ti':p.n, trHoy||M.cielo(new Date())); return l.length? l.map(x=>x.txt).join('. ')+'.' : (yoMismo?'El cielo no forma aspectos con tu carta hoy.':'El cielo no forma aspectos con su carta hoy.'); })()}</div>
+      <div class="k" style="margin-top:10px">Hoy</div><div class="hoy-items">${itemsHoy(T.diaPersona(c, yoMismo?'ti':p.n, trHoy||M.cielo(new Date())))}</div>
       <div class="k" style="margin-top:10px">Vínculos más intensos</div>
       <ul class="lista">${afines.map(x=>`<li><span class="tono" style="color:${T.tonoLlano(x.H).c}"><i></i></span>${x.otro.n}<span class="orb">${T.intensidadLlana(x.I)}</span></li>`).join('')||'<li class="vacio">todavía no hay nadie más en el mapa</li>'}</ul>
-      ${v?`<div class="cta"><button type="button" class="boton mini ${descubiertos().has(p.id)?'sec':'pulsa'}" id="d-hilo">${descubiertos().has(p.id)?'Ver nuestro hilo':'Descubrir nuestro hilo'}</button></div>`:(!yoMismo&&!p.demo&&yo?'<div class="small muted" style="margin-top:8px">Entre tú y '+p.n+' la intensidad es mínima: no hay aspectos marcados entre sus cartas.</div>':'')}`;
+      ${v?`<div class="cta"><button type="button" class="boton mini ${descubiertos().has(p.id)?'sec':'pulsa'}" id="d-hilo">${descubiertos().has(p.id)?'Ver nuestro hilo':'Descubrir nuestro hilo'}</button></div>`:''}`;
     const b=$('#d-hilo'); if(b) b.addEventListener('click',()=>{ const k=mapa.vinculos.indexOf(v); seleccion={tipo:'hilo',v,k}; pintarDetalle(seleccion,true); });
   } else {
     const v=sel.v; const a=v.a, b=v.b; const tn=T.tonoLlano(v.H);
     const tuyo=yo&&(a.id===yo.id||b.id===yo.id); const otro=tuyo?(a.id===yo.id?b:a):null;
     const [p1,p2]= tuyo ? [yo.id===a.id?a:b, otro] : [a,b];
+    const tr=trHoy||M.cielo(new Date());
+    const lect=L.leerVinculo(v);                       // [intensidad, …aspectos, elementos]
+    const clase=tn.c.includes('oro')?'arm':tn.c.includes('violeta')?'ten':'neu';
+    const tipoAsp=x=>x.a.a===0?'conj':(x.a.a===60||x.a.a===120)?'arm':'ten';
+    const ETQ={arm:'armonía',ten:'tensión',conj:'conjunción'};
     d.innerHTML=`<h4>${tuyo?'Tú':p1.n} <span class="muted">y</span> ${p2.n}</h4>
-      <div class="k">Intensidad</div><div class="medidor"><i style="width:${Math.min(v.I/25*100,100)}%"></i></div><div class="small">${T.intensidadLlana(v.I)}</div>
-      <div class="k" style="margin-top:10px">Tipo de vínculo</div><div class="tono" style="color:${tn.c}"><i></i>${tn.t}</div><div class="small muted">${tn.d}</div>
-      <div class="k" style="margin-top:10px">Aspectos principales</div>
-      <ul class="lista">${v.lista.slice(0,3).map(x=>{ const xx=(tuyo&&p1===b)?Object.assign({},x,{k1:x.k2,k2:x.k1}):x; return `<li>${T.porque(xx,p1.n,p2.n,tuyo)}</li>`; }).join('')||'<li class="vacio">sin aspectos marcados entre sus cartas</li>'}</ul>
-      <div class="k" style="margin-top:10px">Lectura del vínculo</div><div class="small lectura-texto">${L.leerVinculo(v).join(' ')}</div>
-      <div class="k" style="margin-top:10px">Hoy</div><div class="small">${T.diaPareja(p1,p2,trHoy||M.cielo(new Date()),tuyo)}</div>`;
+      <div class="tiles">
+        <div class="tile"><div class="k">Intensidad</div><div class="medidor"><i style="width:${Math.min(v.I/25*100,100)}%"></i></div><b>${M.banda(v.I)}</b></div>
+        <div class="tile ${clase}"><div class="k">Tipo de vínculo</div><b class="tono" style="color:${tn.c}"><i></i>${tn.t}</b><div class="small muted">${tn.d}</div></div>
+      </div>
+      <div class="veredicto ${clase}">${lect[0]}</div>
+      <div class="k" style="margin-top:14px">Hoy</div>
+      ${hoyPareja(p1,p2,tr,tuyo)}
+      <div class="k" style="margin-top:14px">Aspectos principales</div>
+      <div class="aspectos">${v.lista.slice(0,3).map(x=>{ const xx=(tuyo&&p1===b)?Object.assign({},x,{k1:x.k2,k2:x.k1}):x; const t=tipoAsp(x); return `<div class="asp-fila"><span class="asp-glifo ${t}">${M.PGL[xx.k1]} ${x.a.s} ${M.PGL[xx.k2]}</span><span>${T.quienes(xx,p1.n,p2.n,tuyo)}</span><span class="etiqueta ${t}">${ETQ[t]}</span></div>`; }).join('')||'<div class="vacio small">sin aspectos marcados entre sus cartas</div>'}</div>
+      <details class="lectura"><summary>Leer el vínculo completo</summary><ul class="puntos">${lect.slice(1).map(x=>`<li>${x}</li>`).join('')}</ul></details>`;
     if(tuyo&&fijo) descubrir(otro.id);
   }
+}
+/* El cielo de hoy como filas cortas: quién · [glifo aspecto punto] efecto */
+function itemsHoy(l){ return l.length ? l.map(x=>`<span class="hoy-item ${x.tipo==='A'?'arm':x.tipo==='T'?'ten':'conj'}"><b>${M.PGL[x.planeta]} ${x.simbolo} ${x.puntoCorto}</b><span>${x.consecuencia}</span></span>`).join('') : '<span class="muted small">sin aspectos del cielo</span>'; }
+function hoyPareja(p1,p2,tr,tuyo){
+  const n1=tuyo?'ti':p1.n; const l1=T.diaPersona(p1.carta,n1,tr), l2=T.diaPersona(p2.carta,p2.n,tr); const r=T.resumenDia(l1,l2,n1,p2.n);
+  return `<div class="veredicto ${r.clase}"><b>Entre ustedes:</b> ${r.txt}</div>
+    <div class="hoy-fila"><span class="quien">${tuyo?'A ti':'A '+p1.n}</span><div class="hoy-items">${itemsHoy(l1)}</div></div>
+    <div class="hoy-fila"><span class="quien">A ${p2.n}</span><div class="hoy-items">${itemsHoy(l2)}</div></div>`;
 }
 async function descubrir(otroId){
   if(!yo||descubiertos().has(otroId)) return;
