@@ -100,6 +100,7 @@ minuto.
 | `motor.js` | el cálculo: cartas, aspectos, intensidad (Discepolo), tono, tránsitos, etapas |
 | `textos.js` | los términos de la página: puntos de la carta, tipos de vínculo, glosario, recorrido, las doce palabras |
 | `lecturas.js` | qué dice cada signo, cada aspecto entre dos cartas y el cielo de hoy |
+| `dia.js` | el motor del día: fase lunar, aspectos de la Luna, Mercurio retrógrado, casa lunar por persona, «con los demás», «en el trabajo», «esta semana» |
 | `mapa3d.js` | la bóveda en Three.js: anillo, estrellas, hilos, cielo de hoy, nacer |
 | `app.js` | sesión, alta, paneles, descubrimientos, sondeo cada 15 s |
 | `estilos.css` | estilos (noche siempre; sin ajustes para quien entra) |

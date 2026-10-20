@@ -10,7 +10,7 @@
    La base se usa SÓLO a través de funciones (rpc) con el código de
    sesión; la tabla no se lee ni se escribe directo.
    ═══════════════════════════════════════════════════════════ */
-import { crearMapa } from './mapa3d.js?v=2.14';
+import { crearMapa } from './mapa3d.js?v=2.15';
 const M = window.Motor, T = window.Textos, L = window.Lecturas;
 const $ = s=>document.querySelector(s);
 const LS = {sesion:'orbita.sesion'};
@@ -101,12 +101,46 @@ const vinculoCon = id => mapa.vinculos.find(v=>(v.a.id===yo.id&&v.b.id===id)||(v
 const esYo = p => yo && p.id===yo.id;
 
 function pintarClima(){
-  if(!trHoy) return;
-  const cl=T.climaLlano(trHoy,lista);
-  const fF=new Intl.DateTimeFormat('es-MX',{weekday:'long',day:'numeric',month:'long',hour:'2-digit',minute:'2-digit',timeZone:'America/Tijuana'});
-  $('#clima-cuerpo').innerHTML=`<div class="small muted" style="margin-bottom:6px">${fF.format(new Date())}, Tijuana</div>
-    <div>${cl.luna}</div><div style="margin-top:6px">${cl.quien}</div>
-    <div class="small muted" style="margin-top:8px">${['Sun','Moon','Venus','Mars'].map(b=>`${M.PGL[b]} ${M.PLAN[b]} en ${M.SIGNOS[M.signo(trHoy[b])]}`).join(' · ')}</div>`;
+  if(!trHoy||!window.Dia) return;
+  const D=window.Dia; const c=D.cielo(new Date());
+  const yoP = conSesion() ? lista.find(x=>x.id===yo.id) : null;
+  const fF=new Intl.DateTimeFormat('es-MX',{day:'numeric',month:'long',timeZone:'America/Tijuana'});
+  const cls = t => t==='A'?'arm':t==='T'?'ten':t==='C'?'conj':'neu';
+  // titular
+  let h=`<div class="k">El cielo de hoy · ${fF.format(c.fecha)}</div>
+    <div class="titular">${c.titular}</div>
+    <div class="subtitular">${c.subtitular}</div>
+    <details class="lectura"><summary>¿Por qué?</summary><ul class="puntos">${c.porque.map(x=>`<li>${x}</li>`).join('')}</ul></details>
+    <div class="tiles">
+      <div class="tile"><div class="k">Luna</div><b>${c.luna.signo} · ${c.fase.nombre.replace('Luna ','')}</b><div class="small muted">${c.fase.verbo}${c.luna.cambia?` · entra en ${c.luna.cambia.signo} el ${D.fechaCorta(c.luna.cambia.fecha)}`:''}</div></div>
+      <div class="tile ${c.planetas.Mercury.retro?'ten':''}"><div class="k">Mercurio</div><b>${c.planetas.Mercury.signo} · ${c.planetas.Mercury.retro?'retrógrado':'directo'}</b><div class="small muted">${c.planetas.Mercury.retro&&c.planetas.Mercury.estacion?`directo el ${D.fechaCorta(c.planetas.Mercury.estacion)}`:c.planetas.Mercury.estacion?`retrógrado el ${D.fechaCorta(c.planetas.Mercury.estacion)}`:''}${c.planetas.Mercury.cambia?` · entra en ${c.planetas.Mercury.cambia.signo} el ${D.fechaCorta(c.planetas.Mercury.cambia.fecha)}`:''}</div></div>
+    </div>`;
+  // aspectos de la Luna hoy
+  if(c.aspectos.length) h+=`<div class="hoy-items" style="margin-top:4px">${c.aspectos.slice(0,2).map(x=>`<span class="hoy-item ${cls(x.tipo)}"><b>☽ ${x.a.s} ${M.PGL[x.planeta]||({Jupiter:'♃',Saturn:'♄'})[x.planeta]} Luna en ${x.a.n} con ${D.PLANETA[x.planeta]}</b><span>${x.txt}</span></span>`).join('')}</div>`;
+  // para ti
+  if(yoP){
+    const pt=D.paraTi(yoP.carta,c);
+    h+=`<div class="k" style="margin-top:14px">Para ti</div><div class="hoy-items">
+      <span class="hoy-item neu"><b>☽ Luna por tu casa ${pt.casa.n}</b><span>${pt.casa.d}${pt.casa.desdeSol?' · contada desde tu signo solar':''}</span></span>
+      ${pt.transitos.map(x=>`<span class="hoy-item ${cls(x.tipo)}"><b>${M.PGL[x.planeta]} ${x.a.s} ${T.PUNTO[x.punto].corto}</b><span>${x.frase}</span></span>`).join('')}</div>`;
+    // con los demás
+    const otros=lista.filter(p=>p.id!==yo.id&&!p.demo);
+    if(otros.length){
+      const lista3=D.conLosDemas(yoP,otros,c,p=>{ const v=vinculoCon(p.id); return v?T.tonoLlano(v.H):{t:'Neutral',c:'var(--azul)'}; });
+      h+=`<div class="k" style="margin-top:14px">Con los demás</div><div class="hoy-items">${lista3.map(x=>`<span class="hoy-item ${cls(x.tipo)}"><b>Entre tú y ${x.p.n} <span class="etiqueta ${x.etiqueta.c.includes('oro')?'arm':x.etiqueta.c.includes('violeta')?'ten':'conj'}" style="margin-left:6px">${x.etiqueta.t}</span></b><span>${x.frase}</span></span>`).join('')}</div>`;
+    }
+  }
+  // en el trabajo
+  const P=c.planetas;
+  h+=`<div class="k" style="margin-top:14px">En el trabajo</div><div class="trabajo">
+    <div class="trabajo-fila"><span class="glifo-g">☿</span><div><b>Comunicación</b> · Mercurio en ${P.Mercury.signo}${P.Mercury.retro?', retrógrado':''}<div class="small muted">${P.Mercury.retro?D.RETRO+'. ':''}${P.Mercury.lectura}.${P.Mercury.cambia?` Cambia el ${D.fechaCorta(P.Mercury.cambia.fecha)}.`:''}</div></div></div>
+    <div class="trabajo-fila"><span class="glifo-g">♂</span><div><b>Energía y roces</b> · Marte en ${P.Mars.signo}<div class="small muted">Energía ${P.Mars.lectura}.${P.Mars.cambia?` Cambia el ${D.fechaCorta(P.Mars.cambia.fecha)}.`:''}</div></div></div>
+    <div class="trabajo-fila"><span class="glifo-g">♀</span><div><b>Colaboración</b> · Venus en ${P.Venus.signo}<div class="small muted">Colaboración ${P.Venus.lectura}.${P.Venus.cambia?` Cambia el ${D.fechaCorta(P.Venus.cambia.fecha)}.`:''}</div></div></div>
+    <div class="trabajo-fila"><span class="glifo-g">☽</span><div><b>Ciclo</b> · ${c.fase.nombre}<div class="small muted">${c.fase.verbo}: ${c.fase.d}. ${c.fase.proxima.nombre.charAt(0).toUpperCase()+c.fase.proxima.nombre.slice(1)} el ${D.fechaCorta(c.fase.proxima.fecha)}.</div></div></div>
+  </div>`;
+  // esta semana
+  if(c.semana.length) h+=`<details class="lectura"><summary>Esta semana</summary><ul class="puntos">${c.semana.map(x=>`<li><b>${D.fechaCorta(x.fecha)}:</b> ${x.txt}</li>`).join('')}</ul></details>`;
+  $('#clima-cuerpo').innerHTML=h;
 }
 
 function pintarMia(){

@@ -179,6 +179,10 @@ const GLOSARIO = [
   {t:'Hilos', d:'Cada hilo une a dos personas. Grosor: intensidad del vínculo (cuántos aspectos y qué tan exactos). Color: tipo de vínculo. Dorado afinidad, azul neutral, violeta tensión. Ninguno es malo; la tensión también da impulso.'},
   {t:'Elementos', d:'Cada signo pertenece a uno: fuego (impulso), tierra (lo práctico), aire (ideas) o agua (emoción). Es el color del brillo de cada estrella.'},
   {t:'Cielo de hoy', d:'Posición actual del Sol, la Luna, Venus y Marte, marcada en el anillo. La Luna recorre el anillo en un mes y forma aspectos con las estrellas que pasa cerca: esa estrella late. Por eso el mapa cambia cada día.'},
+  {t:'Fase lunar', d:'Cuánta Luna se ve. Nueva: sembrar, arrancar. Creciente: empujar, lo que se empieza crece. Llena: cosechar, se ve lo que ya está. Menguante: cerrar, soltar, ordenar. El ciclo dura 29 días y medio.'},
+  {t:'Casa lunar', d:'Por qué zona de tu carta pasa la Luna hoy. La carta se divide en doce casas (temas de la vida: tú, lo material, mensajes, casa, creatividad, rutina, los demás, lo profundo, horizonte, trabajo, equipo, retiro). La Luna cambia de casa cada dos días y medio: siempre hay algo distinto que decir.'},
+  {t:'Mercurio retrógrado', d:'Unas tres semanas, tres veces al año, Mercurio parece ir hacia atrás visto desde la Tierra. En llano: temporada de revisar, releer y reconfirmar; no es para firmar ni lanzar, y lo que se reabre se resuelve.'},
+  {t:'Tránsito', d:'Un planeta de hoy pasando por un punto de tu carta. Los rápidos (Luna, Mercurio, Venus, Marte) son los que hacen que cada día sea distinto.'},
 ];
 
 /* ---------- recorrido ---------- */

@@ -185,6 +185,16 @@ body.listo .lado{opacity:1;transform:none}
 .hoy-item.arm{border-left-color:var(--oro)} .hoy-item.ten{border-left-color:var(--violeta)} .hoy-item.conj{border-left-color:var(--azul)}
 ul.puntos{margin:6px 0 10px;padding-left:18px;display:grid;gap:6px;font-size:13px;color:var(--ink2);line-height:1.45}
 
+/* ============== el cielo de hoy ============== */
+.titular{font-family:"Cormorant Garamond",serif;font-size:24px;line-height:1.15;margin:4px 0 2px}
+.subtitular{color:var(--ink2);font-size:13px;margin-bottom:4px}
+.trabajo{display:grid;gap:6px}
+.trabajo-fila{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:start;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.06);font-size:13px;line-height:1.4}
+.trabajo-fila:last-child{border-bottom:0}
+.trabajo-fila b{font-weight:600}
+.glifo-g{font-size:18px;color:var(--acc2);text-align:center;padding-top:1px}
+.tile.ten b{color:var(--violeta)}
+
 /* ============== lecturas ============== */
 details.lectura{margin:8px 0 4px;border:1px solid var(--panelline);border-radius:12px;padding:0 12px;background:rgba(255,255,255,.03)}
 details.lectura summary{cursor:pointer;padding:9px 0;font-size:13px;color:var(--acc2);list-style:none;display:flex;align-items:center;gap:8px}
